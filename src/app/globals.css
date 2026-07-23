@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
+
+  /* ── Marka / Primary ── */
+  --color-primary: #2b4aa0;
+  --color-primary-dark: #20326e;
+  --color-primary-light: #3a78c3;
+  --color-primary-soft: #eef2fb;
+  --color-primary-soft-border: #d6e0f5;
+
+  /* ── Admin sidebar ── */
+  --color-admin: #1c2740;
+  --color-admin-divider: #2c395c;
+  --color-admin-muted: #9aa6c9;
+  --color-admin-dot: #4a5680;
+  --color-admin-user: #7f8bb0;
+
+  /* ── Aksanlar ── */
+  --color-accent-orange: #e8663c;
+  --color-accent-yellow: #f5c518;
+
+  /* ── Zeminler ── */
+  --color-page: #eef1f6;
+  --color-panel: #f7f8fb;
+  --color-surface: #ffffff;
+  --color-input: #f6f7fb;
+
+  /* ── Kenarlıklar ── */
+  --color-border-input: #e6e9f0;
+  --color-border-card: #e9ecf4;
+  --color-border-divider: #edeff5;
+
+  /* ── Metin ── */
+  --color-ink: #1b2231;
+  --color-ink-2: #4a5266;
+  --color-ink-3: #5a627a;
+  --color-muted: #77809a;
+  --color-muted-2: #8b93a5;
+  --color-faint: #a3aac0;
+  --color-faint-2: #9aa1b5;
+  --color-dot: #98a0b5;
+
+  /* ── Şekil ── */
+  --radius-field: 10px;
+  --radius-card: 14px;
+  --radius-panel: 18px;
+
+  /* ── Gölge ── */
+  --shadow-surface: 0 18px 50px -22px rgba(27, 34, 49, 0.35);
+  --shadow-soft: 0 8px 22px rgba(27, 34, 49, 0.14);
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Sade, ince scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cdd3e0 transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #cdd3e0;
+  border-radius: 8px;
+}
+
+/* Yatay kaydırılabilir çip satırlarında scrollbar gizle (mobil filtreler) */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

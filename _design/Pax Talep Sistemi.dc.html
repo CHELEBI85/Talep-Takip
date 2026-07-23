@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Manrope',system-ui,sans-serif;background:#e9edf4;color:#1b2231;-webkit-font-smoothing:antialiased;}
+  a{color:#2b4aa0;text-decoration:none;}
+  a:hover{color:#3a78c3;}
+  ::-webkit-scrollbar{width:0;height:0;}
+</style>
+</helmet>
+
+<div style="max-width:1360px;margin:0 auto;padding:44px 32px 120px;">
+
+  <!-- brand bar -->
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
+    <img src="assets/pax-mark.png" alt="Pax" style="width:44px;height:44px;object-fit:contain;">
+    <div>
+      <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;">Pax Medya · Talep Yönetim Sistemi</div>
+      <div style="font-size:14px;color:#77809a;font-weight:500;">İki panelli, responsive tasarım seti — kimlik, müşteri paneli, admin paneli</div>
+    </div>
+  </div>
+
+  <!-- ============ 01 KİMLİK ============ -->
+  <div style="display:flex;align-items:center;gap:14px;margin:56px 0 22px;">
+    <span style="font-size:13px;font-weight:800;color:#2b4aa0;letter-spacing:.14em;">01</span>
+    <span style="font-size:16px;font-weight:800;letter-spacing:.02em;">KİMLİK</span>
+    <span style="flex:1;height:1px;background:#d5dbe8;"></span>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:28px;">
+
+    <!-- LOGIN -->
+    <div style="flex:1 1 560px;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px -22px rgba(27,34,49,.35);border:1px solid #e2e6f0;background:#fff;">
+      <div style="height:36px;background:#fbfbfd;border-bottom:1px solid #edeff5;display:flex;align-items:center;gap:7px;padding:0 14px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#e8663c;"></span>
+        <span style="width:10px;height:10px;border-radius:50%;background:#f5c518;"></span>
+        <span style="width:10px;height:10px;border-radius:50%;background:#3a78c3;"></span>
+        <span style="margin-left:10px;font-size:12px;color:#a3aac0;font-weight:600;">app.paxmedya.com/giris</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;min-height:440px;">
+        <div style="background:linear-gradient(160deg,#2b4aa0,#20326e);padding:40px 34px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;">
+          <img src="assets/pax-mark.png" alt="Pax" style="width:52px;height:52px;object-fit:contain;">
+          <div>
+            <div style="font-size:26px;font-weight:800;line-height:1.2;letter-spacing:-.02em;">Taleplerinizi tek yerden yönetin.</div>
+            <div style="font-size:14px;color:#c3ccec;margin-top:14px;line-height:1.6;font-weight:500;">Yeni talep oluşturun, durumlarını canlı takip edin, ekibimizle hızlıca iletişim kurun.</div>
+          </div>
+          <div style="font-size:12px;color:#8f9bce;font-weight:600;">© 2026 Pax Medya</div>
+        </div>
+        <div style="padding:44px 40px;display:flex;flex-direction:column;justify-content:center;">
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;">Giriş yap</div>
+          <div style="font-size:14px;color:#77809a;margin:6px 0 26px;font-weight:500;">Hesabınıza erişin</div>
+          <label style="font-size:13px;font-weight:600;color:#4a5266;margin-bottom:7px;">E-posta</label>
+          <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;color:#1b2231;margin-bottom:16px;">merkez@aydininsaat.com</div>
+          <label style="font-size:13px;font-weight:600;color:#4a5266;margin-bottom:7px;">Şifre</label>
+          <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;color:#aeb4c6;letter-spacing:.25em;margin-bottom:10px;">••••••••••</div>
+          <div style="display:flex;align-items:center;margin-bottom:22px;">
+            <label style="font-size:13px;color:#77809a;font-weight:500;display:flex;align-items:center;gap:7px;"><span style="width:16px;height:16px;border-radius:5px;border:1.5px solid #c8cee0;display:inline-block;"></span>Beni hatırla</label>
+          </div>
+          <div style="background:#2b4aa0;color:#fff;text-align:center;padding:14px;border-radius:10px;font-size:15px;font-weight:700;">Giriş yap</div>
+          <div style="text-align:center;font-size:13px;color:#77809a;margin-top:20px;font-weight:500;">Hesabınız yok mu? <span style="color:#2b4aa0;font-weight:700;">Kayıt olun</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div style="flex:1 1 560px;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px -22px rgba(27,34,49,.35);border:1px solid #e2e6f0;background:#fff;">
+      <div style="height:36px;background:#fbfbfd;border-bottom:1px solid #edeff5;display:flex;align-items:center;gap:7px;padding:0 14px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#e8663c;"></span>
+        <span style="width:10px;height:10px;border-radius:50%;background:#f5c518;"></span>
+        <span style="width:10px;height:10px;border-radius:50%;background:#3a78c3;"></span>
+        <span style="margin-left:10px;font-size:12px;color:#a3aac0;font-weight:600;">app.paxmedya.com/kayit</span>
+      </div>
+      <div style="padding:40px 46px;min-height:440px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+          <img src="assets/pax-mark.png" alt="Pax" style="width:34px;height:34px;object-fit:contain;">
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;">Kurum kaydı oluşturun</div>
+        </div>
+        <div style="font-size:14px;color:#77809a;margin:0 0 26px 46px;font-weight:500;">Birkaç dakikada başlayın</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 18px;">
+          <div style="grid-column:1 / -1;">
+            <label style="font-size:13px;font-weight:600;color:#4a5266;">Kurum adı</label>
+            <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;margin-top:7px;">Aydın İnşaat A.Ş.</div>
+          </div>
+          <div>
+            <label style="font-size:13px;font-weight:600;color:#4a5266;">Yetkili kişi</label>
+            <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;margin-top:7px;">Merve Aydın</div>
+          </div>
+          <div>
+            <label style="font-size:13px;font-weight:600;color:#4a5266;">Telefon</label>
+            <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;margin-top:7px;">0532 000 00 00</div>
+          </div>
+          <div>
+            <label style="font-size:13px;font-weight:600;color:#4a5266;">E-posta</label>
+            <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;margin-top:7px;">merkez@aydininsaat.com</div>
+          </div>
+          <div>
+            <label style="font-size:13px;font-weight:600;color:#4a5266;">Şifre</label>
+            <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;color:#aeb4c6;letter-spacing:.25em;margin-top:7px;">••••••••</div>
+          </div>
+        </div>
+        <div style="background:#2b4aa0;color:#fff;text-align:center;padding:14px;border-radius:10px;font-size:15px;font-weight:700;margin-top:26px;">Kayıt ol</div>
+        <div style="text-align:center;font-size:13px;color:#77809a;margin-top:18px;font-weight:500;">Zaten üye misiniz? <span style="color:#2b4aa0;font-weight:700;">Giriş yapın</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 02 MÜŞTERİ PANELİ ============ -->
+  <div style="display:flex;align-items:center;gap:14px;margin:64px 0 22px;">
+    <span style="font-size:13px;font-weight:800;color:#2b4aa0;letter-spacing:.14em;">02</span>
+    <span style="font-size:16px;font-weight:800;letter-spacing:.02em;">MÜŞTERİ PANELİ</span>
+    <span style="flex:1;height:1px;background:#d5dbe8;"></span>
+  </div>
+
+  <!-- YENİ TALEP -->
+  <div style="border-radius:18px;overflow:hidden;box-shadow:0 18px 50px -24px rgba(27,34,49,.35);border:1px solid #e2e6f0;background:#fff;margin-bottom:28px;">
+    <div style="height:36px;background:#fbfbfd;border-bottom:1px solid #edeff5;display:flex;align-items:center;gap:7px;padding:0 14px;">
+      <span style="width:10px;height:10px;border-radius:50%;background:#e8663c;"></span><span style="width:10px;height:10px;border-radius:50%;background:#f5c518;"></span><span style="width:10px;height:10px;border-radius:50%;background:#3a78c3;"></span>
+      <span style="margin-left:10px;font-size:12px;color:#a3aac0;font-weight:600;">app.paxmedya.com/talep/yeni</span>
+    </div>
+    <div style="display:grid;grid-template-columns:236px 1fr;min-height:640px;">
+      <!-- sidebar customer -->
+      <div style="background:#fff;border-right:1px solid #edeff5;padding:22px 16px;display:flex;flex-direction:column;">
+        <img src="assets/pax-logo.png" alt="Pax Medya" style="height:30px;object-fit:contain;object-position:left;margin:4px 6px 26px;">
+        <div style="display:flex;align-items:center;gap:11px;background:#eef2fb;color:#2b4aa0;font-weight:700;font-size:14px;padding:11px 13px;border-radius:10px;">
+          <span style="width:8px;height:8px;border-radius:2px;background:#2b4aa0;"></span>Yeni Talep
+        </div>
+        <div style="display:flex;align-items:center;gap:11px;color:#5a627a;font-weight:600;font-size:14px;padding:11px 13px;border-radius:10px;margin-top:4px;">
+          <span style="width:8px;height:8px;border-radius:2px;background:#c3c9d8;"></span>Taleplerim
+        </div>
+        <div style="flex:1;"></div>
+        <div style="display:flex;align-items:center;gap:10px;border-top:1px solid #edeff5;padding-top:16px;">
+          <div style="width:34px;height:34px;border-radius:9px;background:#2b4aa0;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">AA</div>
+          <div style="line-height:1.25;"><div style="font-size:13px;font-weight:700;">Aydın İnşaat</div><div style="font-size:12px;color:#8b93a5;">Müşteri</div></div>
+        </div>
+      </div>
+      <!-- main -->
+      <div style="background:#f7f8fb;padding:0;">
+        <div style="height:64px;background:#fff;border-bottom:1px solid #edeff5;display:flex;align-items:center;justify-content:space-between;padding:0 28px;">
+          <div style="font-size:18px;font-weight:800;letter-spacing:-.01em;">Yeni Talep Oluştur</div>
+          <div style="font-size:13px;color:#8b93a5;font-weight:600;">Kurum: <span style="color:#4a5266;">Aydın İnşaat A.Ş.</span></div>
+        </div>
+        <div style="padding:26px 28px;display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;">
+          <!-- form -->
+          <div style="background:#fff;border:1px solid #e9ecf4;border-radius:14px;padding:24px;">
+            <div style="font-size:14px;font-weight:800;margin-bottom:18px;">Talep bilgileri</div>
+            <label style="font-size:13px;font-weight:600;color:#4a5266;">Talep başlığı</label>
+            <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;margin:7px 0 16px;">Sosyal medya görseli hazırlanması</div>
+            <label style="font-size:13px;font-weight:600;color:#4a5266;">Talep açıklaması</label>
+            <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;line-height:1.6;color:#5a627a;margin:7px 0 16px;min-height:78px;">Ağustos kampanyası için 3 adet Instagram post görseli. Marka renkleri kullanılacak, logo sağ altta yer alacak.</div>
+            <label style="font-size:13px;font-weight:600;color:#4a5266;">Ek not <span style="color:#a3aac0;font-weight:500;">(opsiyonel)</span></label>
+            <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;color:#8b93a5;margin:7px 0 16px;">Ağustos kampanyası, öncelikli.</div>
+            <div style="display:flex;gap:12px;margin-top:6px;">
+              <div style="background:#eef2fb;color:#2b4aa0;border:1px solid #d6e0f5;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:700;">+ Listeye ekle</div>
+              <div style="color:#8b93a5;padding:12px 8px;border-radius:10px;font-size:14px;font-weight:600;">Temizle</div>
+            </div>
+          </div>
+          <!-- added list -->
+          <div style="background:#fff;border:1px solid #e9ecf4;border-radius:14px;padding:22px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div style="font-size:14px;font-weight:800;">Eklenen talepler</div>
+              <span style="font-size:12px;font-weight:700;color:#2b4aa0;background:#eef2fb;padding:3px 9px;border-radius:20px;">2</span>
+            </div>
+            <sc-for list="{{ draftItems }}" as="d" hint-placeholder-count="2">
+              <div style="border:1px solid #eceff5;border-radius:11px;padding:13px 14px;margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;">
+                  <div style="font-size:14px;font-weight:700;line-height:1.35;">{{ d.title }}</div>
+                  <div style="display:flex;gap:10px;flex-shrink:0;font-size:12px;font-weight:700;"><span style="color:#3a78c3;">Düzenle</span><span style="color:#c3785f;">Sil</span></div>
+                </div>
+                <div style="font-size:12px;color:#8b93a5;margin-top:5px;line-height:1.5;">{{ d.meta }}</div>
+              </div>
+            </sc-for>
+            <div style="background:#2b4aa0;color:#fff;text-align:center;padding:14px;border-radius:10px;font-size:15px;font-weight:700;margin-top:6px;">Talepleri Gönder (2)</div>
+            <div style="font-size:12px;color:#9aa1b5;text-align:center;margin-top:12px;line-height:1.5;">Birden fazla talebi tek seferde gönderebilirsiniz. Gönderim sonrası her talep ayrı takip edilir.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TALEPLERİM + DETAY -->
+  <div style="display:flex;flex-wrap:wrap;gap:28px;">
+    <!-- TALEPLERİM -->
+    <div style="flex:1 1 640px;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px -24px rgba(27,34,49,.35);border:1px solid #e2e6f0;background:#fff;">
+      <div style="height:36px;background:#fbfbfd;border-bottom:1px solid #edeff5;display:flex;align-items:center;gap:7px;padding:0 14px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#e8663c;"></span><span style="width:10px;height:10px;border-radius:50%;background:#f5c518;"></span><span style="width:10px;height:10px;border-radius:50%;background:#3a78c3;"></span>
+        <span style="margin-left:10px;font-size:12px;color:#a3aac0;font-weight:600;">app.paxmedya.com/taleplerim</span>
+      </div>
+      <div style="min-height:600px;background:#f7f8fb;">
+        <div style="height:64px;background:#fff;border-bottom:1px solid #edeff5;display:flex;align-items:center;justify-content:space-between;padding:0 26px;">
+          <div style="font-size:18px;font-weight:800;">Taleplerim</div>
+          <div style="background:#2b4aa0;color:#fff;padding:9px 15px;border-radius:9px;font-size:13px;font-weight:700;">+ Yeni Talep</div>
+        </div>
+        <div style="padding:20px 26px;">
+          <!-- filters -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;">
+            <span style="font-size:13px;font-weight:700;background:#2b4aa0;color:#fff;padding:8px 14px;border-radius:20px;">Tümü</span>
+            <sc-for list="{{ statuses }}" as="s" hint-placeholder-count="6">
+              <span style="font-size:13px;font-weight:600;background:#fff;border:1px solid #e6e9f0;color:#5a627a;padding:8px 14px;border-radius:20px;">{{ s }}</span>
+            </sc-for>
+          </div>
+          <!-- cards -->
+          <sc-for list="{{ myRequests }}" as="r" hint-placeholder-count="5">
+            <div style="background:#fff;border:1px solid #e9ecf4;border-radius:13px;padding:16px 18px;margin-bottom:12px;">
+              <div style="display:flex;justify-content:space-between;align-items:start;gap:14px;">
+                <div style="min-width:0;">
+                  <div style="font-size:12px;color:#a3aac0;font-weight:700;letter-spacing:.02em;">{{ r.id }}</div>
+                  <div style="font-size:15px;font-weight:800;margin-top:3px;letter-spacing:-.01em;">{{ r.title }}</div>
+                  <div style="font-size:13px;color:#8b93a5;margin-top:7px;">Oluşturma {{ r.created }} · Güncelleme {{ r.updated }}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
+                  <span style="width:7px;height:7px;border-radius:50%;background:#98a0b5;"></span>
+                  <span style="font-size:13px;font-weight:700;color:#4a5266;">{{ r.status }}</span>
+                </div>
+              </div>
+              <sc-if value="{{ r.note }}" hint-placeholder-val="{{ true }}">
+                <div style="background:#f7f8fb;border-radius:9px;padding:10px 12px;margin-top:12px;font-size:13px;color:#5a627a;line-height:1.5;"><span style="font-weight:700;color:#4a5266;">Pax notu:</span> {{ r.note }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <!-- TALEP DETAY (müşteri) -->
+    <div style="flex:1 1 440px;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px -24px rgba(27,34,49,.35);border:1px solid #e2e6f0;background:#fff;">
+      <div style="height:36px;background:#fbfbfd;border-bottom:1px solid #edeff5;display:flex;align-items:center;gap:7px;padding:0 14px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#e8663c;"></span><span style="width:10px;height:10px;border-radius:50%;background:#f5c518;"></span><span style="width:10px;height:10px;border-radius:50%;background:#3a78c3;"></span>
+        <span style="margin-left:10px;font-size:12px;color:#a3aac0;font-weight:600;">app.paxmedya.com/talep/TL-1039</span>
+      </div>
+      <div style="min-height:600px;background:#f7f8fb;padding:24px;">
+        <div style="font-size:13px;color:#8b93a5;font-weight:600;margin-bottom:6px;">← Taleplerim</div>
+        <div style="font-size:12px;color:#a3aac0;font-weight:700;">#TL-1039</div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-.01em;margin-top:3px;">Web sitesine ürün eklenmesi</div>
+        <div style="display:flex;align-items:center;gap:7px;margin-top:10px;">
+          <span style="width:7px;height:7px;border-radius:50%;background:#98a0b5;"></span>
+          <span style="font-size:13px;font-weight:700;color:#4a5266;">İnceleniyor</span>
+          <span style="color:#d5dbe8;">·</span>
+          <span style="font-size:13px;color:#8b93a5;">Güncelleme 18.07.2026</span>
+        </div>
+        <div style="background:#fff;border:1px solid #e9ecf4;border-radius:13px;padding:18px;margin-top:18px;">
+          <div style="font-size:13px;font-weight:800;color:#4a5266;margin-bottom:8px;">Açıklama</div>
+          <div style="font-size:14px;color:#5a627a;line-height:1.65;">Kataloğa 12 yeni ürün eklenecek. Ürün görselleri ve teknik özellikler ekte. Fiyatlar KDV dahil gösterilecek.</div>
+        </div>
+        <div style="background:#eef2fb;border:1px solid #d9e2f6;border-radius:13px;padding:16px 18px;margin-top:14px;">
+          <div style="font-size:13px;font-weight:800;color:#2b4aa0;margin-bottom:6px;">Pax Medya geri bildirimi</div>
+          <div style="font-size:14px;color:#3d4763;line-height:1.6;">Görselleri aldık, 6 ürünü yükledik. Kalan ürünlerin teknik özelliklerini bekliyoruz.</div>
+        </div>
+        <div style="font-size:13px;font-weight:800;color:#4a5266;margin:20px 0 12px;">Talep geçmişi</div>
+        <sc-for list="{{ customerHistory }}" as="h" hint-placeholder-count="3">
+          <div style="display:flex;gap:12px;margin-bottom:14px;">
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <span style="width:9px;height:9px;border-radius:50%;background:#2b4aa0;margin-top:4px;"></span>
+              <span style="flex:1;width:2px;background:#e2e6f0;margin-top:3px;"></span>
+            </div>
+            <div style="padding-bottom:2px;">
+              <div style="font-size:13px;font-weight:700;color:#3d4763;">{{ h.event }}</div>
+              <div style="font-size:12px;color:#9aa1b5;margin-top:2px;">{{ h.date }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 03 ADMIN PANELİ ============ -->
+  <div style="display:flex;align-items:center;gap:14px;margin:64px 0 22px;">
+    <span style="font-size:13px;font-weight:800;color:#e8663c;letter-spacing:.14em;">03</span>
+    <span style="font-size:16px;font-weight:800;letter-spacing:.02em;">ADMIN PANELİ</span>
+    <span style="flex:1;height:1px;background:#d5dbe8;"></span>
+  </div>
+
+  <!-- ADMIN TALEPLER -->
+  <div style="border-radius:18px;overflow:hidden;box-shadow:0 18px 50px -24px rgba(27,34,49,.35);border:1px solid #e2e6f0;background:#fff;margin-bottom:28px;">
+    <div style="height:36px;background:#fbfbfd;border-bottom:1px solid #edeff5;display:flex;align-items:center;gap:7px;padding:0 14px;">
+      <span style="width:10px;height:10px;border-radius:50%;background:#e8663c;"></span><span style="width:10px;height:10px;border-radius:50%;background:#f5c518;"></span><span style="width:10px;height:10px;border-radius:50%;background:#3a78c3;"></span>
+      <span style="margin-left:10px;font-size:12px;color:#a3aac0;font-weight:600;">admin.paxmedya.com/talepler</span>
+    </div>
+    <div style="display:grid;grid-template-columns:236px 1fr;min-height:660px;">
+      <!-- admin sidebar -->
+      <div style="background:#1c2740;padding:22px 16px;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:10px;margin:4px 6px 26px;">
+          <img src="assets/pax-mark.png" alt="Pax" style="width:30px;height:30px;object-fit:contain;">
+          <span style="color:#fff;font-weight:800;font-size:15px;">Pax Admin</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:11px;color:#9aa6c9;font-weight:600;font-size:14px;padding:11px 13px;border-radius:10px;"><span style="width:8px;height:8px;border-radius:2px;background:#4a5680;"></span>Genel Bakış</div>
+        <div style="display:flex;align-items:center;gap:11px;background:#2b4aa0;color:#fff;font-weight:700;font-size:14px;padding:11px 13px;border-radius:10px;margin-top:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#a9c4f0;"></span>Talepler</div>
+        <div style="display:flex;align-items:center;gap:11px;color:#9aa6c9;font-weight:600;font-size:14px;padding:11px 13px;border-radius:10px;margin-top:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#4a5680;"></span>Müşteriler</div>
+        <div style="display:flex;align-items:center;gap:11px;color:#9aa6c9;font-weight:600;font-size:14px;padding:11px 13px;border-radius:10px;margin-top:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#4a5680;"></span>Personel</div>
+        <div style="flex:1;"></div>
+        <div style="display:flex;align-items:center;gap:10px;border-top:1px solid #2c395c;padding-top:16px;">
+          <div style="width:34px;height:34px;border-radius:9px;background:#e8663c;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">MG</div>
+          <div style="line-height:1.25;"><div style="font-size:13px;font-weight:700;color:#fff;">Mehmet Çelebi Gezer</div><div style="font-size:12px;color:#7f8bb0;">Yönetici</div></div>
+        </div>
+      </div>
+      <!-- admin main -->
+      <div style="background:#f7f8fb;">
+        <div style="height:64px;background:#fff;border-bottom:1px solid #edeff5;display:flex;align-items:center;justify-content:space-between;padding:0 26px;">
+          <div style="font-size:18px;font-weight:800;">Gelen Talepler</div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="background:#f2f4f9;border:1px solid #e6e9f0;border-radius:9px;padding:9px 14px;font-size:13px;color:#9aa1b5;font-weight:600;">Ara: talep, kurum…</div>
+          </div>
+        </div>
+        <div style="padding:20px 26px;">
+          <!-- filter row -->
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;">
+            <div style="background:#fff;border:1px solid #e6e9f0;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:#4a5266;display:flex;align-items:center;gap:9px;">Kurum: <span style="font-weight:700;">Tümü</span> <span style="color:#b7bdcd;">▾</span></div>
+            <div style="background:#fff;border:1px solid #e6e9f0;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:#4a5266;display:flex;align-items:center;gap:9px;">Durum: <span style="font-weight:700;">Tümü</span> <span style="color:#b7bdcd;">▾</span></div>
+            <div style="background:#fff;border:1px solid #e6e9f0;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:#4a5266;display:flex;align-items:center;gap:9px;">Atanan: <span style="font-weight:700;">Tümü</span> <span style="color:#b7bdcd;">▾</span></div>
+            <div style="flex:1;"></div>
+            <div style="font-size:13px;color:#8b93a5;font-weight:600;align-self:center;">{{ totalCount }} talep</div>
+          </div>
+          <!-- table -->
+          <div style="background:#fff;border:1px solid #e9ecf4;border-radius:14px;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:1.6fr 1.1fr 1fr 1fr .9fr;padding:13px 18px;background:#fafbfd;border-bottom:1px solid #eceff5;font-size:12px;font-weight:800;color:#8b93a5;letter-spacing:.03em;text-transform:uppercase;">
+              <span>Talep</span><span>Kurum</span><span>Durum</span><span>Atanan</span><span>Güncelleme</span>
+            </div>
+            <sc-for list="{{ allRequests }}" as="r" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:1.6fr 1.1fr 1fr 1fr .9fr;padding:15px 18px;border-bottom:1px solid #f1f3f8;align-items:center;">
+                <div style="min-width:0;"><div style="font-size:14px;font-weight:700;letter-spacing:-.01em;">{{ r.title }}</div><div style="font-size:12px;color:#a3aac0;font-weight:600;margin-top:2px;">{{ r.id }}</div></div>
+                <div style="font-size:13px;color:#5a627a;font-weight:600;">{{ r.org }}</div>
+                <div style="display:flex;align-items:center;gap:7px;"><span style="width:7px;height:7px;border-radius:50%;background:#98a0b5;"></span><span style="font-size:13px;font-weight:700;color:#4a5266;">{{ r.status }}</span></div>
+                <div style="font-size:13px;color:#5a627a;font-weight:600;">{{ r.assignee }}</div>
+                <div style="font-size:13px;color:#8b93a5;">{{ r.updated }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN MÜŞTERİLER + DETAY -->
+  <div style="display:flex;flex-wrap:wrap;gap:28px;">
+    <!-- MÜŞTERİLER -->
+    <div style="flex:1 1 540px;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px -24px rgba(27,34,49,.35);border:1px solid #e2e6f0;background:#fff;">
+      <div style="height:36px;background:#fbfbfd;border-bottom:1px solid #edeff5;display:flex;align-items:center;gap:7px;padding:0 14px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#e8663c;"></span><span style="width:10px;height:10px;border-radius:50%;background:#f5c518;"></span><span style="width:10px;height:10px;border-radius:50%;background:#3a78c3;"></span>
+        <span style="margin-left:10px;font-size:12px;color:#a3aac0;font-weight:600;">admin.paxmedya.com/musteriler</span>
+      </div>
+      <div style="min-height:560px;background:#f7f8fb;">
+        <div style="height:64px;background:#fff;border-bottom:1px solid #edeff5;display:flex;align-items:center;padding:0 26px;font-size:18px;font-weight:800;">Müşteriler</div>
+        <div style="padding:20px 26px;">
+          <div style="background:#fff;border:1px solid #e9ecf4;border-radius:14px;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:1.5fr 1.4fr .7fr;padding:13px 18px;background:#fafbfd;border-bottom:1px solid #eceff5;font-size:12px;font-weight:800;color:#8b93a5;letter-spacing:.03em;text-transform:uppercase;"><span>Kurum</span><span>Yetkili</span><span>Talep</span></div>
+            <sc-for list="{{ customers }}" as="c" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:1.5fr 1.4fr .7fr;padding:15px 18px;border-bottom:1px solid #f1f3f8;align-items:center;">
+                <div style="display:flex;align-items:center;gap:11px;"><div style="width:34px;height:34px;border-radius:9px;background:#eef2fb;color:#2b4aa0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">{{ c.initials }}</div><div style="font-size:14px;font-weight:700;">{{ c.name }}</div></div>
+                <div style="min-width:0;"><div style="font-size:13px;font-weight:600;color:#4a5266;">{{ c.contact }}</div><div style="font-size:12px;color:#9aa1b5;">{{ c.email }}</div></div>
+                <div style="font-size:14px;font-weight:800;color:#2b4aa0;">{{ c.requests }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN TALEP DETAY -->
+    <div style="flex:1 1 460px;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px -24px rgba(27,34,49,.35);border:1px solid #e2e6f0;background:#fff;">
+      <div style="height:36px;background:#fbfbfd;border-bottom:1px solid #edeff5;display:flex;align-items:center;gap:7px;padding:0 14px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#e8663c;"></span><span style="width:10px;height:10px;border-radius:50%;background:#f5c518;"></span><span style="width:10px;height:10px;border-radius:50%;background:#3a78c3;"></span>
+        <span style="margin-left:10px;font-size:12px;color:#a3aac0;font-weight:600;">admin.paxmedya.com/talep/TL-1042</span>
+      </div>
+      <div style="min-height:560px;background:#f7f8fb;padding:24px;">
+        <div style="font-size:12px;color:#a3aac0;font-weight:700;">#TL-1042 · Aydın İnşaat A.Ş.</div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-.01em;margin-top:3px;">Logo güncellenmesi</div>
+        <div style="font-size:14px;color:#5a627a;line-height:1.6;margin-top:12px;">Mevcut logonun yatay versiyonu ve koyu zemin için beyaz varyantı hazırlanacak. Kaynak dosyalar (AI/SVG) teslim edilecek.</div>
+
+        <div style="background:#fff;border:1px solid #e9ecf4;border-radius:13px;padding:16px 18px;margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#9aa1b5;margin-bottom:6px;">Durum</div>
+            <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:9px;padding:10px 12px;font-size:13px;font-weight:700;color:#4a5266;display:flex;justify-content:space-between;">İşleme alındı <span style="color:#b7bdcd;">▾</span></div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#9aa1b5;margin-bottom:6px;">Personele ata</div>
+            <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:9px;padding:10px 12px;font-size:13px;font-weight:700;color:#4a5266;display:flex;justify-content:space-between;">Ece Yılmaz <span style="color:#b7bdcd;">▾</span></div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div style="font-size:12px;font-weight:700;color:#9aa1b5;margin-bottom:6px;">Müşteriye not / geri bildirim</div>
+          <div style="background:#fff;border:1px solid #e6e9f0;border-radius:10px;padding:13px 14px;font-size:14px;color:#5a627a;line-height:1.55;min-height:64px;">İlk taslak hazır, onayınıza sunuyoruz. Renk tonu için geri bildirim bekliyoruz.</div>
+          <div style="background:#2b4aa0;color:#fff;text-align:center;padding:12px;border-radius:10px;font-size:14px;font-weight:700;margin-top:10px;">Notu kaydet & müşteriye bildir</div>
+        </div>
+
+        <div style="font-size:13px;font-weight:800;color:#4a5266;margin:22px 0 12px;">Talep geçmişi</div>
+        <sc-for list="{{ adminHistory }}" as="h" hint-placeholder-count="4">
+          <div style="display:flex;gap:12px;margin-bottom:14px;">
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <span style="width:9px;height:9px;border-radius:50%;background:#2b4aa0;margin-top:4px;"></span>
+              <span style="flex:1;width:2px;background:#e2e6f0;margin-top:3px;"></span>
+            </div>
+            <div><div style="font-size:13px;font-weight:700;color:#3d4763;">{{ h.event }}</div><div style="font-size:12px;color:#9aa1b5;margin-top:2px;">{{ h.by }} · {{ h.date }}</div></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 04 MOBİL ============ -->
+  <div style="display:flex;align-items:center;gap:14px;margin:64px 0 22px;">
+    <span style="font-size:13px;font-weight:800;color:#f0a500;letter-spacing:.14em;">04</span>
+    <span style="font-size:16px;font-weight:800;letter-spacing:.02em;">MOBİL</span>
+    <span style="flex:1;height:1px;background:#d5dbe8;"></span>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:30px;">
+
+    <!-- phone: giriş -->
+    <div style="width:300px;border-radius:38px;background:#1c2740;padding:11px;box-shadow:0 22px 55px -24px rgba(27,34,49,.5);">
+      <div style="background:#fff;border-radius:29px;overflow:hidden;height:600px;position:relative;">
+        <div style="height:34px;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:700;color:#1b2231;"><span>09:41</span><span>●●●●</span></div>
+        <div style="padding:34px 26px;display:flex;flex-direction:column;height:calc(100% - 34px);">
+          <img src="assets/pax-mark.png" alt="Pax" style="width:56px;height:56px;object-fit:contain;margin:14px auto 0;">
+          <div style="text-align:center;font-size:20px;font-weight:800;margin-top:18px;">Giriş yap</div>
+          <div style="text-align:center;font-size:13px;color:#8b93a5;margin-top:5px;font-weight:500;">Pax Medya Talep Sistemi</div>
+          <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:11px;padding:14px;font-size:14px;margin-top:26px;">merkez@aydininsaat.com</div>
+          <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:11px;padding:14px;font-size:14px;color:#aeb4c6;letter-spacing:.25em;margin-top:12px;">••••••••</div>
+          <div style="background:#2b4aa0;color:#fff;text-align:center;padding:15px;border-radius:11px;font-size:15px;font-weight:700;margin-top:18px;">Giriş yap</div>
+          <div style="flex:1;"></div>
+          <div style="text-align:center;font-size:13px;color:#8b93a5;font-weight:500;">Hesabınız yok mu? <span style="color:#2b4aa0;font-weight:700;">Kayıt olun</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- phone: yeni talep -->
+    <div style="width:300px;border-radius:38px;background:#1c2740;padding:11px;box-shadow:0 22px 55px -24px rgba(27,34,49,.5);">
+      <div style="background:#f7f8fb;border-radius:29px;overflow:hidden;height:600px;">
+        <div style="height:34px;background:#fff;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:700;"><span>09:41</span><span>●●●●</span></div>
+        <div style="background:#fff;border-bottom:1px solid #edeff5;padding:12px 20px;display:flex;align-items:center;gap:10px;"><span style="font-size:20px;color:#4a5266;">←</span><span style="font-size:17px;font-weight:800;">Yeni Talep</span></div>
+        <div style="padding:18px 20px;overflow:hidden;">
+          <div style="font-size:12px;color:#8b93a5;font-weight:600;margin-bottom:14px;">Kurum: <span style="color:#4a5266;">Aydın İnşaat A.Ş.</span></div>
+          <label style="font-size:12px;font-weight:700;color:#4a5266;">Talep başlığı</label>
+          <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:12px;font-size:13px;margin:6px 0 13px;">Sosyal medya görseli</div>
+          <label style="font-size:12px;font-weight:700;color:#4a5266;">Açıklama</label>
+          <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:12px;font-size:13px;color:#5a627a;line-height:1.5;margin:6px 0 13px;min-height:58px;">Ağustos kampanyası için 3 post görseli.</div>
+          <label style="font-size:12px;font-weight:700;color:#4a5266;">Ek not</label>
+          <div style="background:#f6f7fb;border:1px solid #e6e9f0;border-radius:10px;padding:12px;font-size:13px;color:#8b93a5;margin:6px 0 13px;">Öncelikli.</div>
+          <div style="background:#eef2fb;color:#2b4aa0;border:1px solid #d6e0f5;text-align:center;padding:12px;border-radius:10px;font-size:13px;font-weight:700;margin-top:2px;">+ Listeye ekle</div>
+          <div style="background:#2b4aa0;color:#fff;text-align:center;padding:14px;border-radius:10px;font-size:14px;font-weight:700;margin-top:10px;">Gönder (2)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- phone: taleplerim -->
+    <div style="width:300px;border-radius:38px;background:#1c2740;padding:11px;box-shadow:0 22px 55px -24px rgba(27,34,49,.5);">
+      <div style="background:#f7f8fb;border-radius:29px;overflow:hidden;height:600px;">
+        <div style="height:34px;background:#fff;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:700;"><span>09:41</span><span>●●●●</span></div>
+        <div style="background:#fff;border-bottom:1px solid #edeff5;padding:12px 20px;font-size:17px;font-weight:800;">Taleplerim</div>
+        <div style="padding:14px 18px;">
+          <div style="display:flex;gap:7px;overflow:hidden;margin-bottom:14px;">
+            <span style="font-size:12px;font-weight:700;background:#2b4aa0;color:#fff;padding:7px 13px;border-radius:18px;white-space:nowrap;">Tümü</span>
+            <span style="font-size:12px;font-weight:600;background:#fff;border:1px solid #e6e9f0;color:#5a627a;padding:7px 13px;border-radius:18px;white-space:nowrap;">Yeni</span>
+            <span style="font-size:12px;font-weight:600;background:#fff;border:1px solid #e6e9f0;color:#5a627a;padding:7px 13px;border-radius:18px;white-space:nowrap;">İnceleniyor</span>
+          </div>
+          <sc-for list="{{ mobileRequests }}" as="r" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e9ecf4;border-radius:12px;padding:13px 14px;margin-bottom:11px;">
+              <div style="font-size:11px;color:#a3aac0;font-weight:700;">{{ r.id }}</div>
+              <div style="font-size:14px;font-weight:800;margin-top:2px;line-height:1.3;">{{ r.title }}</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:9px;">
+                <span style="font-size:12px;color:#9aa1b5;">{{ r.updated }}</span>
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:6px;height:6px;border-radius:50%;background:#98a0b5;"></span><span style="font-size:12px;font-weight:700;color:#4a5266;">{{ r.status }}</span></span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <!-- phone: admin talepler -->
+    <div style="width:300px;border-radius:38px;background:#1c2740;padding:11px;box-shadow:0 22px 55px -24px rgba(27,34,49,.5);">
+      <div style="background:#f7f8fb;border-radius:29px;overflow:hidden;height:600px;">
+        <div style="height:34px;background:#1c2740;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:12px;font-weight:700;color:#fff;"><span>09:41</span><span>●●●●</span></div>
+        <div style="background:#1c2740;padding:10px 20px 14px;display:flex;align-items:center;gap:9px;"><img src="assets/pax-mark.png" style="width:24px;height:24px;object-fit:contain;"><span style="color:#fff;font-size:16px;font-weight:800;">Pax Admin · Talepler</span></div>
+        <div style="padding:14px 18px;">
+          <div style="display:flex;gap:8px;margin-bottom:14px;">
+            <div style="flex:1;background:#fff;border:1px solid #e6e9f0;border-radius:9px;padding:9px 11px;font-size:12px;font-weight:700;color:#4a5266;display:flex;justify-content:space-between;">Kurum ▾</div>
+            <div style="flex:1;background:#fff;border:1px solid #e6e9f0;border-radius:9px;padding:9px 11px;font-size:12px;font-weight:700;color:#4a5266;display:flex;justify-content:space-between;">Durum ▾</div>
+          </div>
+          <sc-for list="{{ mobileAdmin }}" as="r" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e9ecf4;border-radius:12px;padding:13px 14px;margin-bottom:11px;">
+              <div style="font-size:14px;font-weight:800;line-height:1.3;">{{ r.title }}</div>
+              <div style="font-size:12px;color:#8b93a5;font-weight:600;margin-top:3px;">{{ r.org }}</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:9px;">
+                <span style="font-size:12px;color:#9aa1b5;">{{ r.assignee }}</span>
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:6px;height:6px;border-radius:50%;background:#98a0b5;"></span><span style="font-size:12px;font-weight:700;color:#4a5266;">{{ r.status }}</span></span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const statuses = ["Yeni","İnceleniyor","İşleme alındı","Bilgi bekleniyor","Tamamlandı","İptal edildi"];
+
+    const allRequests = [
+      {id:"#TL-1042", title:"Logo güncellenmesi", org:"Aydın İnşaat A.Ş.", status:"İşleme alındı", assignee:"Ece Yılmaz", created:"14.07.2026", updated:"19.07.2026", note:"İlk taslak hazır, onayınıza sunuyoruz."},
+      {id:"#TL-1041", title:"Katalog tasarımı", org:"Vega Yazılım", status:"Bilgi bekleniyor", assignee:"Ece Yılmaz", created:"13.07.2026", updated:"17.07.2026", note:""},
+      {id:"#TL-1040", title:"Sosyal medya görseli hazırlanması", org:"Marmara Turizm", status:"İşleme alındı", assignee:"Selin Ak", created:"12.07.2026", updated:"18.07.2026", note:""},
+      {id:"#TL-1039", title:"Web sitesine ürün eklenmesi", org:"Deniz Gıda Ltd.", status:"İnceleniyor", assignee:"Kaan Demir", created:"11.07.2026", updated:"18.07.2026", note:""},
+      {id:"#TL-1038", title:"Instagram reels kurgusu", org:"Nova Kozmetik", status:"Tamamlandı", assignee:"Selin Ak", created:"08.07.2026", updated:"15.07.2026", note:""},
+      {id:"#TL-1037", title:"Kampanya afişi", org:"Aydın İnşaat A.Ş.", status:"İptal edildi", assignee:"—", created:"05.07.2026", updated:"07.07.2026", note:""},
+    ];
+
+    const myRequests = [
+      {id:"#TL-1042", title:"Logo güncellenmesi", status:"İşleme alındı", created:"14.07.2026", updated:"19.07.2026", note:"İlk taslak hazır, onayınıza sunuyoruz. Renk tonu için geri bildirim bekliyoruz."},
+      {id:"#TL-1039", title:"Web sitesine ürün eklenmesi", status:"İnceleniyor", created:"11.07.2026", updated:"18.07.2026", note:"Görselleri aldık, 6 ürünü yükledik. Kalan ürünleri bekliyoruz."},
+      {id:"#TL-1037", title:"Kampanya afişi", status:"İptal edildi", created:"05.07.2026", updated:"07.07.2026", note:""},
+    ];
+
+    const customers = [
+      {name:"Aydın İnşaat A.Ş.", initials:"AA", contact:"Merve Aydın", email:"merkez@aydininsaat.com", requests:3},
+      {name:"Deniz Gıda Ltd.", initials:"DG", contact:"Onur Deniz", email:"onur@denizgida.com", requests:2},
+      {name:"Marmara Turizm", initials:"MT", contact:"Ayça Kaya", email:"ayca@marmaraturizm.com", requests:4},
+      {name:"Vega Yazılım", initials:"VY", contact:"Emre Vural", email:"emre@vega.dev", requests:1},
+      {name:"Nova Kozmetik", initials:"NK", contact:"İpek Nur", email:"ipek@novakozmetik.com", requests:2},
+    ];
+
+    const draftItems = [
+      {title:"Logo güncellenmesi", meta:"Açıklama + ek not · yatay & beyaz varyant"},
+      {title:"Sosyal medya görseli hazırlanması", meta:"Açıklama + ek not · 3 Instagram postu"},
+    ];
+
+    const customerHistory = [
+      {event:"Talep oluşturuldu", date:"11.07.2026 · 10:24"},
+      {event:"Durum \"İnceleniyor\" olarak güncellendi", date:"12.07.2026 · 09:10"},
+      {event:"Pax Medya geri bildirim ekledi", date:"18.07.2026 · 14:32"},
+    ];
+
+    const adminHistory = [
+      {event:"Talep oluşturuldu", by:"Aydın İnşaat", date:"14.07.2026 10:24"},
+      {event:"Ece Yılmaz'a atandı", by:"Mehmet Çelebi Gezer", date:"14.07.2026 11:02"},
+      {event:"Durum \"İşleme alındı\"", by:"Ece Yılmaz", date:"16.07.2026 09:40"},
+      {event:"Müşteriye not gönderildi", by:"Ece Yılmaz", date:"19.07.2026 15:18"},
+    ];
+
+    return {
+      statuses, allRequests, myRequests, customers, draftItems,
+      customerHistory, adminHistory,
+      totalCount: allRequests.length,
+      mobileRequests: myRequests,
+      mobileAdmin: allRequests.slice(0,4),
+    };
+  }
+}
+</script>
+</body>
+</html>
