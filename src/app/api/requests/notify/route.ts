@@ -2,6 +2,7 @@ import { Resend } from "resend";
 
 type NotifyRequest = {
   org?: unknown;
+  customerEmail?: unknown;
   requests?: unknown;
 };
 
@@ -10,6 +11,12 @@ type RequestSummary = {
   title: string;
   description: string;
   note?: string;
+};
+
+type FirestoreValue = {
+  arrayValue?: { values?: FirestoreValue[] };
+  stringValue?: string;
+  mapValue?: { fields?: Record<string, FirestoreValue> };
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,12 +28,6 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
-
-type FirestoreValue = {
-  arrayValue?: { values?: FirestoreValue[] };
-  stringValue?: string;
-  mapValue?: { fields?: Record<string, FirestoreValue> };
-};
 
 function asRecipients(values: FirestoreValue[] = []): string[] {
   return Array.from(
@@ -96,14 +97,19 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as NotifyRequest;
   const requests = asRequests(body.requests);
   const org = typeof body.org === "string" ? body.org : "Bilinmeyen kurum";
+  const customerEmail =
+    typeof body.customerEmail === "string" ? body.customerEmail : "";
   const recipients = await getRecipients(request.headers.get("authorization"), org);
 
   if (recipients.length === 0 || requests.length === 0) {
     return Response.json({ ok: false, error: "Bildirim verisi eksik." }, { status: 400 });
   }
 
-  const from = process.env.RESEND_FROM_EMAIL ?? "Pax Medya <onboarding@resend.dev>";
   const safeOrg = escapeHtml(org);
+  const safeEmail = escapeHtml(customerEmail);
+  const customerEmailLine = safeEmail
+    ? `<p style="margin:4px 0 0;color:#667085"><strong>Musteri e-postasi:</strong> ${safeEmail}</p>`
+    : "";
   const rows = requests
     .map((item) => {
       const note = item.note?.trim()
@@ -111,7 +117,7 @@ export async function POST(request: Request) {
         : "";
       return `
         <li style="margin:0 0 18px;padding:16px;border:1px solid #e7eaf1;border-radius:10px">
-          <div style="font-weight:800;color:#1d2b4f">${escapeHtml(item.code)} · ${escapeHtml(item.title)}</div>
+          <div style="font-weight:800;color:#1d2b4f">${escapeHtml(item.code)} - ${escapeHtml(item.title)}</div>
           <p style="margin:8px 0 0;color:#475467;line-height:1.55">${escapeHtml(item.description)}</p>
           ${note}
         </li>`;
@@ -120,13 +126,15 @@ export async function POST(request: Request) {
 
   const resend = new Resend(apiKey);
   const result = await resend.emails.send({
-    from,
+    from: process.env.RESEND_FROM_EMAIL ?? "Pax Medya <onboarding@resend.dev>",
     to: recipients,
-    subject: `${org} yeni talep oluşturdu`,
+    subject: `${org} yeni talep olusturdu`,
     html: `
       <div style="font-family:Arial,sans-serif;color:#101828">
-        <h2 style="margin:0 0 8px">Yeni talep oluşturuldu</h2>
-        <p style="margin:0 0 20px;color:#475467"><strong>${safeOrg}</strong> tarafından ${requests.length} yeni talep gönderildi.</p>
+        <h2 style="margin:0 0 8px">Yeni talep olusturuldu</h2>
+        <p style="margin:0;color:#475467"><strong>Musteri:</strong> ${safeOrg}</p>
+        ${customerEmailLine}
+        <p style="margin:16px 0 20px;color:#475467">${requests.length} yeni talep gonderildi.</p>
         <ul style="list-style:none;margin:0;padding:0">${rows}</ul>
       </div>
     `,

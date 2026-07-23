@@ -147,6 +147,11 @@ interface StoreValue {
   removeStaff: (id: string) => Promise<void>;
   /** Boş kurulumda başlangıç personel listesini ekler. */
   seedStaff: () => Promise<void>;
+  createStaffAccount: (data: {
+    name: string;
+    email: string;
+    password: string;
+  }) => Promise<void>;
 
   /** Admin hesabi ekle veya rolunu guncelle. */
   addAdmin: (email: string, role: AdminRole) => Promise<void>;
@@ -317,6 +322,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const rows = snap.docs.map((s) => ({
           id: s.id,
           name: (s.data().name as string) ?? "",
+          email: (s.data().email as string) ?? "",
+          uid: (s.data().uid as string) ?? "",
         }));
         rows.sort((a, b) => a.name.localeCompare(b.name, "tr"));
         setStaffFeed({ uid, rows });
@@ -466,6 +473,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       body: JSON.stringify({
         org,
+        customerEmail: user.email ?? "",
         requests: items.map((d, i) => ({
           code: `#PAX-${firstCode + i}`,
           title: d.title,
@@ -577,9 +585,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [staff]
   );
 
-  const removeStaff = useCallback(async (id: string) => {
-    await deleteDoc(doc(getDb(), "staff", id));
-  }, []);
+  const removeStaff = useCallback(
+    async (id: string) => {
+      const person = staff.find((item) => item.id === id);
+      const batch = writeBatch(getDb());
+      batch.delete(doc(getDb(), "staff", id));
+      if (person?.email) {
+        batch.delete(doc(getDb(), "admins", normalizeEmail(person.email)));
+      }
+      await batch.commit();
+    },
+    [staff]
+  );
 
   const seedStaff = useCallback(async () => {
     if (staff.length > 0) return;
@@ -589,6 +606,34 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     );
     await batch.commit();
   }, [staff]);
+
+  const createStaffAccount = useCallback(
+    async ({
+      name,
+      email,
+      password,
+    }: {
+      name: string;
+      email: string;
+      password: string;
+    }) => {
+      if (!user) throw new Error("Oturum bulunamadi.");
+      const token = await user.getIdToken();
+      const res = await fetch("/api/staff/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error ?? "Personel hesabi acilamadi.");
+      }
+    },
+    [user]
+  );
 
   const addAdmin = useCallback(async (email: string, role: AdminRole) => {
     const normalized = normalizeEmail(email);
@@ -676,6 +721,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     addStaff,
     removeStaff,
     seedStaff,
+    createStaffAccount,
     addAdmin,
     updateAdminRole,
     removeAdmin,

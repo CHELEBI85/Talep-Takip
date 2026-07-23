@@ -73,8 +73,10 @@ export interface Staff {
   /** Firestore belge kimliği. */
   id: string;
   name: string;
+  email?: string;
+  uid?: string;
 }
-export type AdminRole = "super_admin" | "admin" | "staff";
+export type AdminRole = "super_admin" | "admin";
 
 export interface AdminAccount {
   id: string;

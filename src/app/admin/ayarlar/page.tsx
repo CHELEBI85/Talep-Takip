@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Input, Label, Select, Textarea } from "@/components/ui/Field";
@@ -12,7 +13,6 @@ import type { AdminRole, NotificationRule } from "@/lib/types";
 const ROLES: { value: AdminRole; label: string }[] = [
   { value: "super_admin", label: "Super Admin" },
   { value: "admin", label: "Admin" },
-  { value: "staff", label: "Personel Admin" },
 ];
 
 function normalizeEmail(email: string): string {
@@ -31,6 +31,7 @@ function parseEmails(value: string): string[] {
 }
 
 export default function AdminAyarlarPage() {
+  const router = useRouter();
   const {
     admins,
     customers,
@@ -41,7 +42,7 @@ export default function AdminAyarlarPage() {
     setNotificationRecipients,
     setNotificationRules,
   } = useStore();
-  const { user } = useAuth();
+  const { user, adminRole, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<AdminRole>("admin");
   const [recipientsDraft, setRecipientsDraft] = useState<string | null>(null);
@@ -52,6 +53,10 @@ export default function AdminAyarlarPage() {
 
   const recipientsText =
     recipientsDraft ?? notificationSettings.recipients.join("\n");
+
+  useEffect(() => {
+    if (!loading && adminRole !== "super_admin") router.replace("/admin");
+  }, [loading, adminRole, router]);
 
   const adminRows = useMemo(() => {
     const envRows = ADMIN_EMAILS.map((adminEmail) => ({
@@ -74,6 +79,14 @@ export default function AdminAyarlarPage() {
         .sort((a, b) => a.localeCompare(b, "tr")),
     [customers]
   );
+
+  if (loading || adminRole !== "super_admin") {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-sm text-muted">
+        Yukleniyor...
+      </div>
+    );
+  }
 
   async function run(action: () => Promise<void>, success: string) {
     setBusy(true);
