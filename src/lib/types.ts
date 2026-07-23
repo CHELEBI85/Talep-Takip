@@ -74,3 +74,22 @@ export interface Staff {
   id: string;
   name: string;
 }
+export type AdminRole = "super_admin" | "admin" | "staff";
+
+export interface AdminAccount {
+  id: string;
+  email: string;
+  role: AdminRole;
+  createdAt?: number;
+  updatedAt?: number;
+}
+
+export interface NotificationRule {
+  email: string;
+  customer: string;
+}
+
+export interface NotificationSettings {
+  recipients: string[];
+  rules: NotificationRule[];
+}

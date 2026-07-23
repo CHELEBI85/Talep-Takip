@@ -9,6 +9,7 @@ import {
   orderBy,
   query,
   runTransaction,
+  setDoc,
   where,
   writeBatch,
   doc,
@@ -27,8 +28,12 @@ import { getDb } from "./firebase";
 import { SEED_STAFF } from "./mock-data";
 import type {
   Customer,
+  AdminAccount,
+  AdminRole,
   DraftRequest,
   HistoryEvent,
+  NotificationRule,
+  NotificationSettings,
   Request,
   Staff,
   Status,
@@ -52,6 +57,18 @@ function nowStamp(): string {
 
 let draftSeq = 0;
 const nextDraftId = () => `draft-${(draftSeq += 1)}`;
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
+function parseEmails(value: string): string[] {
+  return Array.from(
+    new Set(
+      value
+        .split(/[\s,;]+/)
+        .map(normalizeEmail)
+        .filter((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    )
+  );
+}
 
 // Firestore belgesini bileşen şekline (Request) eşle
 type ReqDoc = {
@@ -100,6 +117,8 @@ interface StoreValue {
   drafts: DraftRequest[];
   customers: Customer[];
   staff: Staff[];
+  admins: AdminAccount[];
+  notificationSettings: NotificationSettings;
   loading: boolean;
 
   getRequest: (id: string) => Request | undefined;
@@ -128,6 +147,13 @@ interface StoreValue {
   removeStaff: (id: string) => Promise<void>;
   /** Boş kurulumda başlangıç personel listesini ekler. */
   seedStaff: () => Promise<void>;
+
+  /** Admin hesabi ekle veya rolunu guncelle. */
+  addAdmin: (email: string, role: AdminRole) => Promise<void>;
+  updateAdminRole: (email: string, role: AdminRole) => Promise<void>;
+  removeAdmin: (email: string) => Promise<void>;
+  setNotificationRecipients: (emails: string[]) => Promise<void>;
+  setNotificationRules: (rules: NotificationRule[]) => Promise<void>;
 
   /** Admin listesinde gösterilenden daha eski talep var mı? */
   hasMore: boolean;
@@ -164,6 +190,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [reachedEnd, setReachedEnd] = useState(false);
   const [customerFeed, setCustomerFeed] = useState<Feed<CustomerDoc>>(EMPTY_FEED);
   const [staffFeed, setStaffFeed] = useState<Feed<Staff>>(EMPTY_FEED);
+  const [adminFeed, setAdminFeed] = useState<Feed<AdminAccount>>(EMPTY_FEED);
+  const [notificationFeed, setNotificationFeed] = useState<
+    { uid: string; settings: NotificationSettings }
+  >({ uid: "", settings: { recipients: [], rules: [] } });
   const [profile, setProfile] = useState<{ uid: string; org: string }>({
     uid: "",
     org: "",
@@ -211,6 +241,48 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       (err) => console.error("trash onSnapshot:", err)
     );
   }, [uid, isAdmin]);
+
+  // Realtime: adminler ve roller (yalnizca admin)
+  useEffect(() => {
+    if (!uid || !isAdmin) return;
+    return onSnapshot(
+      collection(getDb(), "admins"),
+      (snap) => {
+        const rows = snap.docs.map((s) => {
+          const d = s.data() as Omit<AdminAccount, "id">;
+          return {
+            id: s.id,
+            email: d.email ?? s.id,
+            role: d.role ?? "admin",
+            createdAt: d.createdAt,
+            updatedAt: d.updatedAt,
+          };
+        });
+        rows.sort((a, b) => a.email.localeCompare(b.email));
+        setAdminFeed({ uid, rows });
+      },
+      (err) => console.error("admins onSnapshot:", err)
+    );
+  }, [uid, isAdmin]);
+
+  // Realtime: mail bildirim ayarlari
+  useEffect(() => {
+    if (!uid) return;
+    return onSnapshot(
+      doc(getDb(), "settings", "notifications"),
+      (snap) => {
+        const data = snap.data() as NotificationSettings | undefined;
+        setNotificationFeed({
+          uid,
+          settings: {
+            recipients: Array.isArray(data?.recipients) ? data.recipients : [],
+            rules: Array.isArray(data?.rules) ? data.rules : [],
+          },
+        });
+      },
+      (err) => console.error("notifications onSnapshot:", err)
+    );
+  }, [uid]);
 
   // ── Realtime: müşteriler (yalnızca admin) ──
   useEffect(() => {
@@ -269,6 +341,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const customerDocs =
     uid && isAdmin && customerFeed.uid === uid ? customerFeed.rows : EMPTY_ROWS;
   const staff = uid && isAdmin && staffFeed.uid === uid ? staffFeed.rows : EMPTY_ROWS;
+  const admins = uid && isAdmin && adminFeed.uid === uid ? adminFeed.rows : EMPTY_ROWS;
+  const notificationSettings =
+    uid && notificationFeed.uid === uid
+      ? notificationFeed.settings
+      : { recipients: [], rules: [] };
   const org = uid && profile.uid === uid ? profile.org : "";
   // Kullanıcı varken henüz o kullanıcıya ait anlık görüntü gelmediyse yükleniyor.
   const loading = !!uid && requestFeed.uid !== uid;
@@ -349,11 +426,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const stamp = Date.now();
     const items = [...drafts];
     const counterRef = doc(getDb(), "counters", "requests");
+    let firstCode = 1001;
     await runTransaction(getDb(), async (tx) => {
       const counter = await tx.get(counterRef);
       const start = counter.exists()
         ? (counter.data().next as number)
         : 1001;
+      firstCode = start;
       tx.set(counterRef, { next: start + items.length });
       items.forEach((d, i) => {
         tx.set(doc(collection(getDb(), "requests")), {
@@ -378,9 +457,31 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         });
       });
     });
+    const hasNotificationTarget =
+      notificationSettings.recipients.length > 0 ||
+      notificationSettings.rules.some((rule) => rule.customer === org);
+    if (hasNotificationTarget) {
+      const token = await user.getIdToken();
+      await fetch("/api/requests/notify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          org,
+          requests: items.map((d, i) => ({
+            code: `#PAX-${firstCode + i}`,
+            title: d.title,
+            description: d.description,
+            note: d.note?.trim() ? d.note.trim() : "",
+          })),
+        }),
+      }).catch((err) => console.error("request notification:", err));
+    }
     setDrafts([]);
     return items.length;
-  }, [user, drafts, org]);
+  }, [user, drafts, org, notificationSettings.recipients, notificationSettings.rules]);
 
   // ── Admin mutasyonları ──
   // Talep güncellemesi ve geçmiş kaydı tek batch'te gider: biri yazılıp
@@ -494,12 +595,75 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     await batch.commit();
   }, [staff]);
 
+  const addAdmin = useCallback(async (email: string, role: AdminRole) => {
+    const normalized = normalizeEmail(email);
+    if (!normalized) return;
+    await setDoc(
+      doc(getDb(), "admins", normalized),
+      {
+        email: normalized,
+        role,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      { merge: true }
+    );
+  }, []);
+
+  const updateAdminRole = useCallback(async (email: string, role: AdminRole) => {
+    const normalized = normalizeEmail(email);
+    if (!normalized) return;
+    await setDoc(
+      doc(getDb(), "admins", normalized),
+      { email: normalized, role, updatedAt: Date.now() },
+      { merge: true }
+    );
+  }, []);
+
+  const removeAdmin = useCallback(async (email: string) => {
+    const normalized = normalizeEmail(email);
+    if (!normalized || user?.email?.toLowerCase() === normalized) return;
+    await deleteDoc(doc(getDb(), "admins", normalized));
+  }, [user]);
+
+  const setNotificationRecipients = useCallback(async (emails: string[]) => {
+    await setDoc(
+      doc(getDb(), "settings", "notifications"),
+      {
+        recipients: parseEmails(emails.join(",")),
+        rules: notificationSettings.rules,
+        updatedAt: Date.now(),
+      },
+      { merge: true }
+    );
+  }, [notificationSettings.rules]);
+
+  const setNotificationRules = useCallback(async (rules: NotificationRule[]) => {
+    const cleanRules = rules
+      .map((rule) => ({
+        email: normalizeEmail(rule.email),
+        customer: rule.customer.trim(),
+      }))
+      .filter((rule) => rule.email && rule.customer);
+    await setDoc(
+      doc(getDb(), "settings", "notifications"),
+      {
+        recipients: notificationSettings.recipients,
+        rules: cleanRules,
+        updatedAt: Date.now(),
+      },
+      { merge: true }
+    );
+  }, [notificationSettings.recipients]);
+
   const value: StoreValue = {
     requests: activeRequests,
     trash,
     drafts,
     customers,
     staff,
+    admins,
+    notificationSettings,
     loading,
     getRequest,
     myRequests,
@@ -517,6 +681,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     addStaff,
     removeStaff,
     seedStaff,
+    addAdmin,
+    updateAdminRole,
+    removeAdmin,
+    setNotificationRecipients,
+    setNotificationRules,
     hasMore: isAdmin && !reachedEnd,
     loadMore,
   };

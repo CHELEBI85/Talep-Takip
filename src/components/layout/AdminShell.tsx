@@ -27,6 +27,11 @@ const NAV: NavItem[] = [
     match: (p) => p.startsWith("/admin/personel"),
   },
   {
+    label: "Ayarlar",
+    href: "/admin/ayarlar",
+    match: (p) => p.startsWith("/admin/ayarlar"),
+  },
+  {
     label: "Çöp Kutusu",
     href: "/admin/cop-kutusu",
     match: (p) => p.startsWith("/admin/cop-kutusu"),

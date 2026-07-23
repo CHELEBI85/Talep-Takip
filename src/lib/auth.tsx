@@ -8,7 +8,7 @@ import {
   updateProfile,
   type User,
 } from "firebase/auth";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import {
   createContext,
   useContext,
@@ -18,6 +18,7 @@ import {
   type ReactNode,
 } from "react";
 import { ADMIN_EMAILS, getAuthClient, getDb } from "./firebase";
+import type { AdminRole } from "./types";
 
 interface SignUpData {
   org: string;
@@ -31,6 +32,7 @@ interface AuthValue {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
+  adminRole: AdminRole | null;
   /** Giriş yapan müşterinin kurum adı (displayName). */
   org: string;
   signIn: (email: string, password: string) => Promise<User>;
@@ -43,6 +45,10 @@ const AuthContext = createContext<AuthValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [adminDoc, setAdminDoc] = useState<{
+    email: string;
+    role: AdminRole | null;
+  }>({ email: "", role: null });
 
   useEffect(() => {
     return onAuthStateChanged(getAuthClient(), (u) => {
@@ -51,12 +57,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  useEffect(() => {
+    const email = user?.email?.toLowerCase();
+    if (!email || ADMIN_EMAILS.includes(email)) return;
+    return onSnapshot(
+      doc(getDb(), "admins", email),
+      (snap) => {
+        const role = snap.data()?.role as AdminRole | undefined;
+        setAdminDoc({ email, role: snap.exists() ? role ?? "admin" : null });
+      },
+      (err) => {
+        console.error("admin role onSnapshot:", err);
+        setAdminDoc({ email, role: null });
+      }
+    );
+  }, [user]);
+
   const value = useMemo<AuthValue>(() => {
-    const isAdmin = !!user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase());
+    const email = user?.email?.toLowerCase() ?? "";
+    const envAdmin = !!email && ADMIN_EMAILS.includes(email);
+    const firestoreRole = adminDoc.email === email ? adminDoc.role : null;
+    const checkingAdmin = !!email && !envAdmin && adminDoc.email !== email;
+    const isAdmin = envAdmin || !!firestoreRole;
     return {
       user,
-      loading,
+      loading: loading || checkingAdmin,
       isAdmin,
+      adminRole: envAdmin ? "super_admin" : firestoreRole,
       org: user?.displayName ?? "",
       async signIn(email, password) {
         const cred = await signInWithEmailAndPassword(getAuthClient(), email, password);
@@ -99,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await signOut(getAuthClient());
       },
     };
-  }, [user, loading]);
+  }, [user, loading, adminDoc]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

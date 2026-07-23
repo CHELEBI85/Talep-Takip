@@ -9,10 +9,13 @@ service cloud.firestore {
     // Admin e-postaları — .env.local'deki NEXT_PUBLIC_ADMIN_EMAILS ile eşleşmeli
     function isAdmin() {
       return isSignedIn() &&
-        request.auth.token.email in [
-          'yusufsaikincil@gmail.com',
-          'admin@paxmedya.com.tr'
-        ];
+        (
+          request.auth.token.email in [
+            'yusufsaikincil@gmail.com',
+            'admin@paxmedya.com.tr'
+          ] ||
+          exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
+        );
     }
 
     // Talebi oluşturanın kayıtlı kurum adı. Kurum adı istemciye (displayName)
@@ -113,6 +116,37 @@ service cloud.firestore {
         request.resource.data.name.size() > 0 &&
         request.resource.data.name.size() <= 100;
       allow delete: if isAdmin();
+    }
+
+    // Admin hesaplari ve roller.
+    // Belge kimligi = e-posta. Ortam degiskenindeki ilk adminler panelden
+    // yeni admin ekleyebilir; sonrasinda bu koleksiyon dinamik yetki verir.
+    match /admins/{email} {
+      function validAdmin() {
+        return request.resource.data.keys().hasOnly(
+                 ['email', 'role', 'createdAt', 'updatedAt']
+               ) &&
+               request.resource.data.email == email &&
+               request.resource.data.role in ['super_admin', 'admin', 'staff'];
+      }
+
+      allow read: if isAdmin() ||
+        (isSignedIn() && request.auth.token.email == email);
+      allow create, update: if isAdmin() && validAdmin();
+      allow delete: if isAdmin() && request.auth.token.email != email;
+    }
+
+    // Sistem ayarlari.
+    match /settings/notifications {
+      allow read: if isSignedIn();
+      allow create, update: if isAdmin() &&
+        request.resource.data.keys().hasOnly(['recipients', 'rules', 'updatedAt']) &&
+        request.resource.data.recipients is list &&
+        request.resource.data.recipients.size() <= 25 &&
+        (!request.resource.data.keys().hasAny(['rules']) ||
+          (request.resource.data.rules is list &&
+           request.resource.data.rules.size() <= 100));
+      allow delete: if false;
     }
 
     // ── Talep kodu sayacı (#PAX-…) ──
