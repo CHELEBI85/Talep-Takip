@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input, Label } from "@/components/ui/Field";
 import { useAuth } from "@/lib/auth";
-import { ADMIN_EMAILS } from "@/lib/firebase";
 
 function authError(code: string): string {
   switch (code) {
@@ -44,13 +43,20 @@ export default function GirisPage() {
     setError("");
     setBusy(true);
     try {
-      const u = await signIn(email, password);
-      const isAdmin = ADMIN_EMAILS.includes((u.email ?? "").toLowerCase());
-      router.replace(isAdmin ? "/admin" : "/taleplerim");
+      await signIn(email, password);
+      router.replace("/");
     } catch (err) {
       setError(authError((err as { code?: string })?.code ?? ""));
       setBusy(false);
     }
+  }
+
+  if (loading || (user && !busy)) {
+    return (
+      <div className="flex min-h-[280px] items-center justify-center text-sm text-muted">
+        Yukleniyor...
+      </div>
+    );
   }
 
   return (

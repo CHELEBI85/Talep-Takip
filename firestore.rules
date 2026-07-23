@@ -14,6 +14,9 @@ service cloud.firestore {
             'yusufsaikincil@gmail.com',
             'admin@paxmedya.com.tr'
           ] ||
+          request.auth.uid in [
+            'm4zO1iCFPMWMqsn6QwtUkX5hL0y2'
+          ] ||
           exists(/databases/$(database)/documents/admins/$(request.auth.token.email))
         );
     }

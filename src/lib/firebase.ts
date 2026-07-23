@@ -63,6 +63,11 @@ export const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
+export const ADMIN_UIDS = (process.env.NEXT_PUBLIC_ADMIN_UIDS ?? "")
+  .split(",")
+  .map((uid) => uid.trim())
+  .filter(Boolean);
+
 // Analytics yalnızca tarayıcıda ve destekleniyorsa yüklenir (SSR guard)
 export async function initAnalytics() {
   if (typeof window === "undefined") return null;

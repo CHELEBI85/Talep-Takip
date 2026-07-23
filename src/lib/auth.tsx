@@ -17,7 +17,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ADMIN_EMAILS, getAuthClient, getDb } from "./firebase";
+import { ADMIN_EMAILS, ADMIN_UIDS, getAuthClient, getDb } from "./firebase";
 import type { AdminRole } from "./types";
 
 interface SignUpData {
@@ -59,7 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const email = user?.email?.toLowerCase();
-    if (!email || ADMIN_EMAILS.includes(email)) return;
+    if (!email || ADMIN_EMAILS.includes(email) || ADMIN_UIDS.includes(user?.uid ?? "")) {
+      return;
+    }
     return onSnapshot(
       doc(getDb(), "admins", email),
       (snap) => {
@@ -75,7 +77,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthValue>(() => {
     const email = user?.email?.toLowerCase() ?? "";
-    const envAdmin = !!email && ADMIN_EMAILS.includes(email);
+    const uidAdmin = !!user?.uid && ADMIN_UIDS.includes(user.uid);
+    const envAdmin = (!!email && ADMIN_EMAILS.includes(email)) || uidAdmin;
     const firestoreRole = adminDoc.email === email ? adminDoc.role : null;
     const checkingAdmin = !!email && !envAdmin && adminDoc.email !== email;
     const isAdmin = envAdmin || !!firestoreRole;
@@ -90,7 +93,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Kurum profili eksikse tamamla (kayıt sırasında yazım yarıda
         // kalmış olabilir). merge: mevcut contact/phone alanlarını korur.
         const u = cred.user;
-        const admin = !!u.email && ADMIN_EMAILS.includes(u.email.toLowerCase());
+        const admin =
+          (!!u.email && ADMIN_EMAILS.includes(u.email.toLowerCase())) ||
+          ADMIN_UIDS.includes(u.uid);
         if (!admin) {
           try {
             await setDoc(
