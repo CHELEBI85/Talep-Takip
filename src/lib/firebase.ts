@@ -12,7 +12,15 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const REQUIRED = ["apiKey", "authDomain", "projectId", "appId"] as const;
+// Zorunlu alanlar ve karşılık gelen ortam değişkeni adları. Adlar elle
+// yazılır: config anahtarından türetilse "apiKey" → "APIKEY" gibi var
+// olmayan bir değişken adı önerilirdi.
+const REQUIRED: [keyof typeof firebaseConfig, string][] = [
+  ["apiKey", "NEXT_PUBLIC_FIREBASE_API_KEY"],
+  ["authDomain", "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"],
+  ["projectId", "NEXT_PUBLIC_FIREBASE_PROJECT_ID"],
+  ["appId", "NEXT_PUBLIC_FIREBASE_APP_ID"],
+];
 
 // Firebase istemcileri modül yüklenirken DEĞİL, ilk kullanımda kurulur.
 // Sayfalar statik olarak prerender edildiği için modül gövdesi build
@@ -24,12 +32,14 @@ let authRef: Auth | null = null;
 let dbRef: Firestore | null = null;
 
 function firebaseApp(): FirebaseApp {
-  const missing = REQUIRED.filter((k) => !firebaseConfig[k]);
+  const missing = REQUIRED.filter(([key]) => !firebaseConfig[key]).map(
+    ([, envName]) => envName
+  );
   if (missing.length > 0) {
     throw new Error(
-      `Firebase yapılandırması eksik: ${missing
-        .map((k) => `NEXT_PUBLIC_FIREBASE_${k.toUpperCase()}`)
-        .join(", ")}. Ortam değişkenlerini (Vercel → Environment Variables) tanımlayın.`
+      `Firebase yapılandırması eksik: ${missing.join(", ")}. Ortam ` +
+        `değişkenlerini (Vercel → Environment Variables) tanımlayıp yeniden ` +
+        `deploy edin — NEXT_PUBLIC_* değerleri build sırasında gömülür.`
     );
   }
   // Next.js fast-refresh / SSR'de çift init'i önle
