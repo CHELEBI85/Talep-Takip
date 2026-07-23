@@ -457,31 +457,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         });
       });
     });
-    const hasNotificationTarget =
-      notificationSettings.recipients.length > 0 ||
-      notificationSettings.rules.some((rule) => rule.customer === org);
-    if (hasNotificationTarget) {
-      const token = await user.getIdToken();
-      await fetch("/api/requests/notify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          org,
-          requests: items.map((d, i) => ({
-            code: `#PAX-${firstCode + i}`,
-            title: d.title,
-            description: d.description,
-            note: d.note?.trim() ? d.note.trim() : "",
-          })),
-        }),
-      }).catch((err) => console.error("request notification:", err));
-    }
+    const token = await user.getIdToken();
+    await fetch("/api/requests/notify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        org,
+        requests: items.map((d, i) => ({
+          code: `#PAX-${firstCode + i}`,
+          title: d.title,
+          description: d.description,
+          note: d.note?.trim() ? d.note.trim() : "",
+        })),
+      }),
+    }).catch((err) => console.error("request notification:", err));
     setDrafts([]);
     return items.length;
-  }, [user, drafts, org, notificationSettings.recipients, notificationSettings.rules]);
+  }, [user, drafts, org]);
 
   // ── Admin mutasyonları ──
   // Talep güncellemesi ve geçmiş kaydı tek batch'te gider: biri yazılıp
