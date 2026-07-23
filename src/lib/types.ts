@@ -17,6 +17,8 @@ export interface HistoryEvent {
   by?: string;
   /** "14.07.2026 11:02" biçiminde okunabilir tarih. */
   date: string;
+  /** Sıralama için ms zaman damgası (alt koleksiyon kayıtlarında bulunur). */
+  at?: number;
 }
 
 // ── Talep ────────────────────────────────────────────────────────────────
@@ -36,6 +38,11 @@ export interface Request {
   feedback?: string;
   created: string; // "14.07.2026"
   updated: string; // "19.07.2026"
+  /**
+   * Eski kayıtlardaki belge içi geçmiş dizisi. Yeni olaylar
+   * `requests/{id}/history` alt koleksiyonuna yazılır (belge 1 MB sınırına
+   * dayanmasın diye); ikisini `useRequestHistory` birleştirir.
+   */
   history: HistoryEvent[];
   /** Soft-delete: çöp kutusundaysa true. Veri asla kalıcı silinmez. */
   deleted?: boolean;
@@ -61,6 +68,9 @@ export interface Customer {
 }
 
 // ── Personel ─────────────────────────────────────────────────────────────
+// Firestore `staff` koleksiyonundan gelir (yönetici ekler/çıkarır).
 export interface Staff {
+  /** Firestore belge kimliği. */
+  id: string;
   name: string;
 }

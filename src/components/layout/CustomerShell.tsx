@@ -63,7 +63,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
             alt="Pax Medya"
             width={88}
             height={88}
-            className="h-[88px] w-[88px] object-contain"
+            className="h-22 w-22 object-contain"
             priority
           />
         </Link>

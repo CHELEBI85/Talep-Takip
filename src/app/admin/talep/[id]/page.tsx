@@ -6,7 +6,7 @@ import { use, useState } from "react";
 import { Timeline } from "@/components/Timeline";
 import { Select } from "@/components/ui/Field";
 import { StatusPill } from "@/components/ui/StatusPill";
-import { useStore } from "@/lib/store";
+import { useRequestHistory, useStore } from "@/lib/store";
 import { STATUSES, type Status } from "@/lib/types";
 
 export default function AdminTalepDetayPage({
@@ -27,6 +27,7 @@ export default function AdminTalepDetayPage({
     restore,
   } = useStore();
   const req = getRequest(id);
+  const history = useRequestHistory(req);
 
   // Not kutusu: kullanıcı yazana kadar kayıtlı geri bildirimi gösterir.
   // Taslak, ait olduğu talep koduyla saklanır — veri sonradan geldiğinde
@@ -237,9 +238,14 @@ export default function AdminTalepDetayPage({
                   }
                 >
                   <option value="—">Atanmadı</option>
+                  {/* Listeden çıkarılmış olsa bile mevcut atama görünür kalmalı */}
+                  {req.assignee !== "—" &&
+                    !staff.some((s) => s.name === req.assignee) && (
+                      <option value={req.assignee}>{req.assignee}</option>
+                    )}
                   {staff.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
+                    <option key={s.id} value={s.name}>
+                      {s.name}
                     </option>
                   ))}
                 </Select>
@@ -254,7 +260,7 @@ export default function AdminTalepDetayPage({
                 value={feedback}
                 onChange={(e) => setDraft({ id: req.id, text: e.target.value })}
                 placeholder="Müşteriye iletilecek notu yazın…"
-                className="min-h-[88px] w-full resize-y rounded-field border border-border-input bg-input px-3.5 py-3 text-sm leading-relaxed text-ink outline-none transition-colors focus:border-primary focus:bg-white"
+                className="min-h-22 w-full resize-y rounded-field border border-border-input bg-input px-3.5 py-3 text-sm leading-relaxed text-ink outline-none transition-colors focus:border-primary focus:bg-white"
               />
               <button
                 onClick={handleSend}
@@ -273,7 +279,7 @@ export default function AdminTalepDetayPage({
             <div className="mb-4 text-[13px] font-extrabold uppercase tracking-[0.04em] text-muted-2">
               Talep geçmişi
             </div>
-            <Timeline items={req.history} showBy />
+            <Timeline items={history} showBy />
           </div>
 
           {/* Soft-delete: talep çöp kutusuna taşınır, veri kaybolmaz. */}

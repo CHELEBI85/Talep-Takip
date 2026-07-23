@@ -64,7 +64,7 @@ export default function KayitPage() {
           alt="Pax Medya"
           width={88}
           height={88}
-          className="h-[88px] w-[88px] object-contain"
+          className="h-22 w-22 object-contain"
           priority
         />
         <div className="mt-3 text-[22px] font-extrabold tracking-[-0.02em]">
@@ -76,7 +76,7 @@ export default function KayitPage() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-x-[18px]">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-x-4.5">
           <div className="sm:col-span-2">
             <Label htmlFor="org" className="mb-1.5">
               Kurum adı

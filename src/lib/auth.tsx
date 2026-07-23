@@ -17,7 +17,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ADMIN_EMAILS, auth, db } from "./firebase";
+import { ADMIN_EMAILS, getAuthClient, getDb } from "./firebase";
 
 interface SignUpData {
   org: string;
@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (u) => {
+    return onAuthStateChanged(getAuthClient(), (u) => {
       setUser(u);
       setLoading(false);
     });
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAdmin,
       org: user?.displayName ?? "",
       async signIn(email, password) {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const cred = await signInWithEmailAndPassword(getAuthClient(), email, password);
         // Kurum profili eksikse tamamla (kayıt sırasında yazım yarıda
         // kalmış olabilir). merge: mevcut contact/phone alanlarını korur.
         const u = cred.user;
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!admin) {
           try {
             await setDoc(
-              doc(db, "customers", u.uid),
+              doc(getDb(), "customers", u.uid),
               {
                 org: u.displayName ?? "",
                 email: u.email ?? "",
@@ -82,10 +82,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return cred.user;
       },
       async signUp({ org, contact, phone, email, password }) {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const cred = await createUserWithEmailAndPassword(getAuthClient(), email, password);
         await updateProfile(cred.user, { displayName: org });
         // Müşteri (kurum) profilini Firestore'a yaz
-        await setDoc(doc(db, "customers", cred.user.uid), {
+        await setDoc(doc(getDb(), "customers", cred.user.uid), {
           org,
           contact,
           phone,
@@ -96,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return cred.user;
       },
       async logout() {
-        await signOut(auth);
+        await signOut(getAuthClient());
       },
     };
   }, [user, loading]);

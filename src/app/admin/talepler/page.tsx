@@ -10,7 +10,7 @@ import { STATUSES } from "@/lib/types";
 const COLS = "grid-cols-[1.6fr_1.1fr_1fr_1fr_0.9fr]";
 
 export default function AdminTaleplerPage() {
-  const { requests, customers, staff } = useStore();
+  const { requests, customers, staff, hasMore, loadMore } = useStore();
 
   const [org, setOrg] = useState("Tümü");
   const [status, setStatus] = useState("Tümü");
@@ -69,7 +69,7 @@ export default function AdminTaleplerPage() {
             label="Atanan"
             value={assignee}
             onChange={setAssignee}
-            options={[...staff, "—"]}
+            options={[...staff.map((s) => s.name), "—"]}
           />
           <div className="ml-auto self-center text-[13px] font-semibold text-muted-2">
             {list.length} talep
@@ -140,6 +140,18 @@ export default function AdminTaleplerPage() {
             </p>
           )}
         </div>
+
+        {/* Liste en yeni taleplerle sınırlıdır; daha eskiler istek üzerine gelir. */}
+        {hasMore && (
+          <div className="mt-4 text-center">
+            <button
+              onClick={loadMore}
+              className="min-h-11 rounded-field border border-border-input bg-white px-5 py-3 text-sm font-bold text-ink-2 transition-colors hover:bg-panel"
+            >
+              Daha eski talepleri yükle
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

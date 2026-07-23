@@ -4,7 +4,7 @@ import Link from "next/link";
 import { use } from "react";
 import { Timeline } from "@/components/Timeline";
 import { StatusPill } from "@/components/ui/StatusPill";
-import { useStore } from "@/lib/store";
+import { useRequestHistory, useStore } from "@/lib/store";
 
 export default function TalepDetayPage({
   params,
@@ -14,6 +14,7 @@ export default function TalepDetayPage({
   const { id } = use(params);
   const { getRequest, loading } = useStore();
   const req = getRequest(id);
+  const history = useRequestHistory(req);
 
   if (loading && !req) {
     return (
@@ -119,7 +120,7 @@ export default function TalepDetayPage({
           <div className="mb-4 text-[13px] font-extrabold uppercase tracking-[0.04em] text-muted-2">
             Talep geçmişi
           </div>
-          <Timeline items={req.history} />
+          <Timeline items={history} />
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
-import { getApp, getApps, initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,11 +12,40 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Next.js fast-refresh / SSR'de çift init'i önle
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const REQUIRED = ["apiKey", "authDomain", "projectId", "appId"] as const;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Firebase istemcileri modül yüklenirken DEĞİL, ilk kullanımda kurulur.
+// Sayfalar statik olarak prerender edildiği için modül gövdesi build
+// sırasında sunucuda da çalışır; orada getAuth() çağırmak, env değişkenleri
+// eksik olduğunda tüm build'i "auth/invalid-api-key" ile düşürürdü.
+// Tembel kurulumla bu yalnızca tarayıcıda, net bir mesajla ortaya çıkar.
+let appRef: FirebaseApp | null = null;
+let authRef: Auth | null = null;
+let dbRef: Firestore | null = null;
+
+function firebaseApp(): FirebaseApp {
+  const missing = REQUIRED.filter((k) => !firebaseConfig[k]);
+  if (missing.length > 0) {
+    throw new Error(
+      `Firebase yapılandırması eksik: ${missing
+        .map((k) => `NEXT_PUBLIC_FIREBASE_${k.toUpperCase()}`)
+        .join(", ")}. Ortam değişkenlerini (Vercel → Environment Variables) tanımlayın.`
+    );
+  }
+  // Next.js fast-refresh / SSR'de çift init'i önle
+  if (!appRef) appRef = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  return appRef;
+}
+
+export function getAuthClient(): Auth {
+  if (!authRef) authRef = getAuth(firebaseApp());
+  return authRef;
+}
+
+export function getDb(): Firestore {
+  if (!dbRef) dbRef = getFirestore(firebaseApp());
+  return dbRef;
+}
 
 // Admin e-posta listesi (env'den)
 export const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
@@ -28,8 +57,6 @@ export const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
 export async function initAnalytics() {
   if (typeof window === "undefined") return null;
   const { getAnalytics, isSupported } = await import("firebase/analytics");
-  if (await isSupported()) return getAnalytics(app);
+  if (await isSupported()) return getAnalytics(firebaseApp());
   return null;
 }
-
-export default app;

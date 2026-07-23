@@ -65,15 +65,18 @@ service cloud.firestore {
                d.title is string && d.title.size() > 0 && d.title.size() <= 200 &&
                d.description is string && d.description.size() <= 5000 &&
                d.note is string && d.note.size() <= 2000 &&
+               // Belge içindeki geçmiş yalnızca oluşturma kaydını taşır.
                d.history.size() == 1;
       }
 
-      // Admin güncellemesinde de kimlik alanları değişmez kalır.
+      // Admin güncellemesinde de kimlik alanları değişmez kalır. Belge içi
+      // geçmiş dizisi de dondurulmuştur — yeni olaylar alt koleksiyona gider.
       function immutableFields() {
         return request.resource.data.code == resource.data.code &&
                request.resource.data.ownerUid == resource.data.ownerUid &&
                request.resource.data.org == resource.data.org &&
-               request.resource.data.createdAt == resource.data.createdAt;
+               request.resource.data.createdAt == resource.data.createdAt &&
+               request.resource.data.history == resource.data.history;
       }
 
       allow read: if isAdmin() ||
@@ -81,6 +84,35 @@ service cloud.firestore {
       allow create: if isSignedIn() && validNewRequest();
       allow update: if isAdmin() && immutableFields();
       allow delete: if false;
+
+      // ── Talep geçmişi (oluşturma sonrası olaylar) ──
+      // Belge içi dizi yerine alt koleksiyon: geçmiş 1 MB belge sınırına
+      // dayanmadan büyüyebilir. Kayıt yalnızca eklenebilir — hiçbir zaman
+      // değiştirilemez veya silinemez: denetim izi.
+      match /history/{entryId} {
+        allow read: if isAdmin() ||
+          (isSignedIn() &&
+           get(/databases/$(database)/documents/requests/$(id)).data.ownerUid
+             == request.auth.uid);
+        // Oluşturma sonrası her olayı yönetici üretir.
+        allow create: if isAdmin() &&
+          request.resource.data.keys().hasOnly(['event', 'by', 'date', 'at']) &&
+          request.resource.data.event is string &&
+          request.resource.data.event.size() <= 300;
+        allow update, delete: if false;
+      }
+    }
+
+    // ── Personel ──
+    // Organizasyon içi ekip listesi; yalnızca yönetici görür ve düzenler.
+    // Listeden çıkarma, geçmiş atamaları (requests.assignee) etkilemez.
+    match /staff/{id} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin() &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        request.resource.data.name.size() <= 100;
+      allow delete: if isAdmin();
     }
 
     // ── Talep kodu sayacı (#PAX-…) ──
