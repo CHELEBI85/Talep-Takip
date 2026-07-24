@@ -1,13 +1,11 @@
+import { ADMIN_EMAILS, ADMIN_UIDS } from "@/lib/firebase";
+import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
+
 type CreateStaffBody = {
   name?: unknown;
   email?: unknown;
   password?: unknown;
 };
-
-type FirestoreField =
-  | { stringValue: string }
-  | { integerValue: string }
-  | { booleanValue: boolean };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -15,50 +13,33 @@ function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
-function fields(data: Record<string, FirestoreField>) {
-  return { fields: data };
-}
+async function isSuperAdmin(uid: string, email?: string) {
+  const normalized = normalizeEmail(email ?? "");
+  if (ADMIN_UIDS.includes(uid) || ADMIN_EMAILS.includes(normalized)) return true;
+  if (!normalized) return false;
 
-async function assertAdmin(authHeader: string | null, projectId: string) {
-  if (!authHeader?.startsWith("Bearer ")) return false;
-
-  const res = await fetch(
-    `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/staff?pageSize=1`,
-    { headers: { Authorization: authHeader } }
-  );
-  return res.ok;
-}
-
-async function firestorePatch(
-  path: string,
-  authHeader: string,
-  data: Record<string, FirestoreField>
-) {
-  const res = await fetch(path, {
-    method: "PATCH",
-    headers: {
-      Authorization: authHeader,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(fields(data)),
-  });
-  if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`Firestore yazma hatasi: ${res.status} ${detail}`);
-  }
-  return res.json();
+  const snap = await getAdminDb().collection("admins").doc(normalized).get();
+  return snap.exists && snap.data()?.role === "super_admin";
 }
 
 export async function POST(request: Request) {
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-  const authHeader = request.headers.get("authorization");
-
-  if (!projectId || !apiKey) {
-    return Response.json({ ok: false, error: "Firebase env eksik." }, { status: 500 });
+  let auth;
+  let db;
+  try {
+    auth = getAdminAuth();
+    db = getAdminDb();
+  } catch (e) {
+    return Response.json(
+      { ok: false, error: e instanceof Error ? e.message : "Firebase Admin baslatilamadi." },
+      { status: 500 }
+    );
   }
-  if (!(await assertAdmin(authHeader, projectId))) {
-    return Response.json({ ok: false, error: "Yetkisiz islem." }, { status: 403 });
+
+  const authHeader = request.headers.get("authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  const decoded = token ? await auth.verifyIdToken(token).catch(() => null) : null;
+  if (!decoded || !(await isSuperAdmin(decoded.uid, decoded.email))) {
+    return Response.json({ ok: false, error: "Bu islem sadece super admin icin." }, { status: 403 });
   }
 
   const body = (await request.json().catch(() => ({}))) as CreateStaffBody;
@@ -73,48 +54,32 @@ export async function POST(request: Request) {
     );
   }
 
-  const signUpRes = await fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, displayName: name, returnSecureToken: false }),
-    }
-  );
-  const signUpData = (await signUpRes.json().catch(() => ({}))) as {
-    localId?: string;
-    error?: { message?: string };
-  };
-
-  if (!signUpRes.ok || !signUpData.localId) {
-    const message =
-      signUpData.error?.message === "EMAIL_EXISTS"
-        ? "Bu e-posta ile zaten hesap var."
-        : "Personel hesabi acilamadi.";
-    return Response.json({ ok: false, error: message }, { status: 400 });
+  const existing = await auth.getUserByEmail(email).catch(() => null);
+  if (existing) {
+    return Response.json({ ok: false, error: "Bu e-posta ile zaten hesap var." }, { status: 400 });
   }
 
-  const base = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
-  const now = String(Date.now());
-
-  await firestorePatch(`${base}/admins/${encodeURIComponent(email)}`, authHeader!, {
-    email: { stringValue: email },
-    role: { stringValue: "admin" },
-    createdAt: { integerValue: now },
-    updatedAt: { integerValue: now },
-  });
-
-  await firestorePatch(`${base}/staff/${signUpData.localId}`, authHeader!, {
-    name: { stringValue: name },
-    email: { stringValue: email },
-    uid: { stringValue: signUpData.localId },
-    createdAt: { integerValue: now },
-  });
-
-  return Response.json({
-    ok: true,
-    uid: signUpData.localId,
+  const user = await auth.createUser({
     email,
-    role: "admin",
+    password,
+    displayName: name,
   });
+  const now = Date.now();
+
+  await db.runTransaction(async (tx) => {
+    tx.set(db.collection("admins").doc(email), {
+      email,
+      role: "admin",
+      createdAt: now,
+      updatedAt: now,
+    });
+    tx.set(db.collection("staff").doc(user.uid), {
+      name,
+      email,
+      uid: user.uid,
+      createdAt: now,
+    });
+  });
+
+  return Response.json({ ok: true, uid: user.uid, email, role: "admin" });
 }

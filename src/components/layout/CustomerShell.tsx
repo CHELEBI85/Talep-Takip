@@ -2,23 +2,40 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import {
+  ClipboardList,
+  PlusCircle,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Avatar } from "@/components/ui/Avatar";
 import { useAuth } from "@/lib/auth";
 import { LogoutConfirmModal } from "./LogoutConfirmModal";
 
-type NavItem = { label: string; href: string; match: (p: string) => boolean };
+type NavItem = {
+  label: string;
+  href: string;
+  match: (p: string) => boolean;
+  icon: LucideIcon;
+};
 
 const NAV: NavItem[] = [
-  { label: "Yeni Talep", href: "/talep/yeni", match: (p) => p === "/talep/yeni" },
+  {
+    label: "Yeni Talep",
+    href: "/talep/yeni",
+    match: (p) => p === "/talep/yeni",
+    icon: PlusCircle,
+  },
   {
     label: "Taleplerim",
     href: "/taleplerim",
     match: (p) =>
       p === "/taleplerim" || (p.startsWith("/talep/") && p !== "/talep/yeni"),
+    icon: ClipboardList,
   },
-  { label: "Profil", href: "/profil", match: (p) => p === "/profil" },
+  { label: "Profil", href: "/profil", match: (p) => p === "/profil", icon: UserRound },
 ];
 
 function initialsOf(name: string): string {
@@ -79,6 +96,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col gap-1">
             {NAV.map((item) => {
               const active = item.match(pathname);
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.href}
@@ -89,11 +107,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
                       : "font-semibold text-[#5a627a] hover:bg-panel"
                   }`}
                 >
-                  <span
-                    className={`h-2 w-2 rounded-[2px] ${
-                      active ? "bg-primary" : "bg-[#c3c9d8]"
-                    }`}
-                  />
+                  <Icon className="h-[17px] w-[17px] shrink-0" strokeWidth={2.2} />
                   {item.label}
                 </Link>
               );
@@ -142,6 +156,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
       <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-border-divider bg-white lg:hidden">
         {NAV.map((item) => {
           const active = item.match(pathname);
+          const Icon = item.icon;
           return (
             <Link
               key={item.href}
@@ -150,11 +165,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
                 active ? "text-primary" : "text-muted-2"
               }`}
             >
-              <span
-                className={`h-2 w-2 rounded-[2px] ${
-                  active ? "bg-primary" : "bg-[#c3c9d8]"
-                }`}
-              />
+              <Icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
               {item.label}
             </Link>
           );

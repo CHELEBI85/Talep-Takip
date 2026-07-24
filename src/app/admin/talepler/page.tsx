@@ -179,8 +179,8 @@ function FilterSelect({
         className="absolute inset-0 cursor-pointer opacity-0"
       >
         <option value="Tümü">Tümü</option>
-        {options.map((o) => (
-          <option key={o} value={o}>
+        {options.map((o, i) => (
+          <option key={`${o}-${i}`} value={o}>
             {o}
           </option>
         ))}

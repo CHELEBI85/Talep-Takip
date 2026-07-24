@@ -23,9 +23,9 @@ export default function AdminMusterilerPage() {
             <span>Yetkili</span>
             <span>Talep</span>
           </div>
-          {customers.map((c) => (
+          {customers.map((c, i) => (
             <div
-              key={c.name}
+              key={`${c.email}-${i}`}
               className={`grid ${COLS} items-center border-b border-[#f1f3f8] px-[18px] py-[15px] last:border-0`}
             >
               <div className="flex items-center gap-2.5">
@@ -47,9 +47,9 @@ export default function AdminMusterilerPage() {
 
         {/* ── Mobil kart listesi ── */}
         <div className="flex flex-col gap-3 sm:hidden">
-          {customers.map((c) => (
+          {customers.map((c, i) => (
             <div
-              key={c.name}
+              key={`${c.email}-${i}`}
               className="rounded-[12px] border border-border-card bg-white p-3.5"
             >
               <div className="flex items-center gap-2.5">

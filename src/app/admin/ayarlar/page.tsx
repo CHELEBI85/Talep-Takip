@@ -45,6 +45,8 @@ export default function AdminAyarlarPage() {
   const { user, adminRole, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<AdminRole>("admin");
+  const [passwordEmail, setPasswordEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [recipientsDraft, setRecipientsDraft] = useState<string | null>(null);
   const [ruleEmail, setRuleEmail] = useState("");
   const [ruleCustomer, setRuleCustomer] = useState("");
@@ -80,6 +82,22 @@ export default function AdminAyarlarPage() {
     [customers]
   );
 
+  const passwordUserOptions = useMemo(() => {
+    const rows = [
+      ...customers.map((customer) => ({
+        email: normalizeEmail(customer.email),
+        label: `${customer.name} - ${normalizeEmail(customer.email)}`,
+      })),
+      ...adminRows.map((admin) => ({
+        email: normalizeEmail(admin.email),
+        label: `${admin.role === "super_admin" ? "Super Admin" : "Admin"} - ${normalizeEmail(admin.email)}`,
+      })),
+    ].filter((item) => item.email);
+    const unique = new Map<string, (typeof rows)[number]>();
+    rows.forEach((item) => unique.set(item.email, item));
+    return Array.from(unique.values()).sort((a, b) => a.label.localeCompare(b.label, "tr"));
+  }, [customers, adminRows]);
+
   if (loading || adminRole !== "super_admin") {
     return (
       <div className="flex min-h-screen items-center justify-center text-sm text-muted">
@@ -88,15 +106,21 @@ export default function AdminAyarlarPage() {
     );
   }
 
-  async function run(action: () => Promise<void>, success: string) {
+  async function run(action: () => Promise<void>, success: string): Promise<boolean> {
     setBusy(true);
     setMessage("");
     try {
       await action();
       setMessage(success);
+      return true;
     } catch (e) {
       console.error("settings action:", e);
-      setMessage("Islem tamamlanamadi. Baglantinizi ve Firestore kurallarini kontrol edin.");
+      setMessage(
+        e instanceof Error
+          ? e.message
+          : "Islem tamamlanamadi. Baglantinizi ve Firestore kurallarini kontrol edin."
+      );
+      return false;
     } finally {
       setBusy(false);
     }
@@ -108,6 +132,30 @@ export default function AdminAyarlarPage() {
     await run(() => addAdmin(normalized, role), "Admin kaydedildi.");
     setEmail("");
     setRole("admin");
+  }
+
+  async function handleChangePassword() {
+    const normalized = normalizeEmail(passwordEmail);
+    if (!user || !normalized || newPassword.length < 6) return;
+    const ok = await run(async () => {
+      const token = await user.getIdToken();
+      const res = await fetch("/api/users/password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email: normalized, password: newPassword }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error ?? "Sifre degistirilemedi.");
+      }
+    }, "Kullanici sifresi degistirildi.");
+    if (ok) {
+      setPasswordEmail("");
+      setNewPassword("");
+    }
   }
 
   async function handleSaveRecipients() {
@@ -224,6 +272,53 @@ export default function AdminAyarlarPage() {
               );
             })}
           </div>
+
+          <div className="mt-6 border-t border-border-divider pt-5">
+            <h2 className="text-sm font-extrabold">Kullanici sifresi degistir</h2>
+            <p className="mt-1 text-[13px] font-semibold text-muted-2">
+              Musteri, admin veya super admin fark etmeden Auth hesabinin yeni sifresini belirler.
+            </p>
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_220px_auto]">
+              <div>
+                <Label htmlFor="password-email" className="mb-1.5">
+                  Kullanici e-postasi
+                </Label>
+                <Select
+                  id="password-email"
+                  value={passwordEmail}
+                  onChange={(e) => setPasswordEmail(e.target.value)}
+                >
+                  <option value="">Kullanici sec</option>
+                  {passwordUserOptions.map((item) => (
+                    <option key={item.email} value={item.email}>
+                      {item.label}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="new-password" className="mb-1.5">
+                  Yeni sifre
+                </Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="En az 6 karakter"
+                />
+              </div>
+              <div className="flex items-end">
+                <Button
+                  variant="soft"
+                  onClick={handleChangePassword}
+                  disabled={busy || !normalizeEmail(passwordEmail) || newPassword.length < 6}
+                >
+                  Sifreyi degistir
+                </Button>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="rounded-card border border-border-card bg-white p-5 sm:p-6">
@@ -276,8 +371,8 @@ export default function AdminAyarlarPage() {
                   onChange={(e) => setRuleCustomer(e.target.value)}
                 >
                   <option value="">Musteri sec</option>
-                  {customerOptions.map((customer) => (
-                    <option key={customer} value={customer}>
+                  {customerOptions.map((customer, i) => (
+                    <option key={`${customer}-${i}`} value={customer}>
                       {customer}
                     </option>
                   ))}
@@ -298,9 +393,9 @@ export default function AdminAyarlarPage() {
                   Henuz musteri bazli mail kurali yok.
                 </div>
               ) : (
-                notificationSettings.rules.map((rule) => (
+                notificationSettings.rules.map((rule, i) => (
                   <div
-                    key={`${rule.email}-${rule.customer}`}
+                    key={`${rule.email}-${rule.customer}-${i}`}
                     className="grid grid-cols-1 gap-2 border-b border-border-divider p-4 last:border-b-0"
                   >
                     <div className="min-w-0">

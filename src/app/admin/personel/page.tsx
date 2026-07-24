@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Field";
+import { useAuth } from "@/lib/auth";
 import { useStore } from "@/lib/store";
 
 function initialsOf(name: string): string {
@@ -20,6 +22,8 @@ function initialsOf(name: string): string {
 }
 
 export default function AdminPersonelPage() {
+  const router = useRouter();
+  const { adminRole, loading } = useAuth();
   const { staff, requests, createStaffAccount, removeStaff } = useStore();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -36,6 +40,18 @@ export default function AdminPersonelPage() {
     ).length;
     return { ...person, total: assigned.length, active };
   });
+
+  useEffect(() => {
+    if (!loading && adminRole !== "super_admin") router.replace("/admin");
+  }, [loading, adminRole, router]);
+
+  if (loading || adminRole !== "super_admin") {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-sm text-muted">
+        Yükleniyor...
+      </div>
+    );
+  }
 
   async function run(action: () => Promise<void>, success: string) {
     setError("");

@@ -8,7 +8,6 @@ import {
   onSnapshot,
   orderBy,
   query,
-  runTransaction,
   setDoc,
   where,
   writeBatch,
@@ -204,6 +203,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     org: "",
   });
   const [drafts, setDrafts] = useState<DraftRequest[]>([]);
+  const [pendingSubmissionId, setPendingSubmissionId] = useState("");
 
   // ── Realtime: talepler ──
   // Admin en yeni `pageSize` talebi görür ("daha fazla yükle" ile pencere
@@ -272,7 +272,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // Realtime: mail bildirim ayarlari
   useEffect(() => {
-    if (!uid) return;
+    if (!uid || !isAdmin) return;
     return onSnapshot(
       doc(getDb(), "settings", "notifications"),
       (snap) => {
@@ -287,7 +287,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       (err) => console.error("notifications onSnapshot:", err)
     );
-  }, [uid]);
+  }, [uid, isAdmin]);
 
   // ── Realtime: müşteriler (yalnızca admin) ──
   useEffect(() => {
@@ -419,9 +419,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
   const clearDrafts = useCallback(() => setDrafts([]), []);
 
-  // ── Talepleri gönder (Firestore'a yaz) ──
-  // #PAX-… kodu, counters/requests belgesindeki merkezi sayaçtan transaction
-  // ile alınır: farklı kurumlar aynı anda gönderse bile kod çakışmaz.
+  // ── Talepleri gönder ──
+  // Talep oluşturma ve #PAX-… sayacı artık server-side API transaction'ında
+  // yapılır. Client yalnızca kullanıcı girdilerini ve idempotency anahtarını yollar.
   const submitDrafts = useCallback(async (): Promise<number> => {
     if (!user || drafts.length === 0) return 0;
     // Kurum adı Firestore profilinden gelir (kurallar da orayla karşılaştırır).
@@ -430,41 +430,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         "Kurum profiliniz yüklenemedi. Sayfayı yenileyip tekrar deneyin."
       );
     }
-    const stamp = Date.now();
     const items = [...drafts];
-    const counterRef = doc(getDb(), "counters", "requests");
-    let firstCode = 1001;
-    await runTransaction(getDb(), async (tx) => {
-      const counter = await tx.get(counterRef);
-      const start = counter.exists()
-        ? (counter.data().next as number)
-        : 1001;
-      firstCode = start;
-      tx.set(counterRef, { next: start + items.length });
-      items.forEach((d, i) => {
-        tx.set(doc(collection(getDb(), "requests")), {
-          code: `#PAX-${start + i}`,
+    const token = await user.getIdToken();
+    const submissionId = pendingSubmissionId || crypto.randomUUID();
+    if (!pendingSubmissionId) setPendingSubmissionId(submissionId);
+    const createRes = await fetch("/api/requests/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        submissionId,
+        requests: items.map((d) => ({
           title: d.title,
           description: d.description,
           note: d.note?.trim() ? d.note.trim() : "",
-          org,
-          ownerUid: user.uid,
-          status: "Yeni" as Status,
-          assignee: "—",
-          feedback: "",
-          createdAt: stamp + i, // sıralama kararlılığı için
-          updatedAt: stamp + i,
-          // Yalnızca oluşturma olayı belgede durur (tek, değişmez kayıt);
-          // sonraki olaylar `history` alt koleksiyonuna yazılır. Kurallardaki
-          // get() aynı transaction'ın yazmalarını göremediği için oluşturma
-          // kaydı alt koleksiyona atomik biçimde yazılamazdı.
-          history: [
-            { event: "Talep oluşturuldu", by: org, date: nowStamp(), at: stamp + i },
-          ],
-        });
-      });
+        })),
+      }),
     });
-    const token = await user.getIdToken();
+    if (!createRes.ok) {
+      const data = (await createRes.json().catch(() => null)) as { error?: string } | null;
+      throw new Error(data?.error ?? "Talepler oluşturulamadı.");
+    }
+    const created = (await createRes.json().catch(() => null)) as {
+      requestIds?: string[];
+    } | null;
+    const requestIds = Array.isArray(created?.requestIds) ? created.requestIds : [];
     await fetch("/api/requests/notify", {
       method: "POST",
       headers: {
@@ -472,19 +464,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        org,
-        customerEmail: user.email ?? "",
-        requests: items.map((d, i) => ({
-          code: `#PAX-${firstCode + i}`,
-          title: d.title,
-          description: d.description,
-          note: d.note?.trim() ? d.note.trim() : "",
-        })),
+        requestIds,
       }),
     }).catch((err) => console.error("request notification:", err));
     setDrafts([]);
+    setPendingSubmissionId("");
     return items.length;
-  }, [user, drafts, org]);
+  }, [user, drafts, org, pendingSubmissionId]);
 
   // ── Admin mutasyonları ──
   // Talep güncellemesi ve geçmiş kaydı tek batch'te gider: biri yazılıp

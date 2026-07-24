@@ -101,3 +101,46 @@ Renk, tipografi, radius ve gölge değerleri `src/app/globals.css` içindeki Tai
 ## Referans
 
 Orijinal teslim brief'i ve hifi tasarım referansı `_design/` klasöründedir (`README.md`, `Pax Talep Sistemi.dc.html`, `assets/`).
+## Canli Yayin Kontrol Listesi
+
+Vercel Environment Variables:
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=...
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+NEXT_PUBLIC_FIREBASE_APP_ID=...
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=...
+NEXT_PUBLIC_ADMIN_EMAILS=...
+NEXT_PUBLIC_ADMIN_UIDS=...
+RESEND_API_KEY=...
+RESEND_FROM_EMAIL=Pax Medya <info@paxmedya.com.tr>
+FIREBASE_SERVICE_ACCOUNT_KEY={...service account json...}
+RATE_LIMIT_HASH_SALT=replace-with-at-least-32-random-characters
+```
+
+`RATE_LIMIT_HASH_SALT` server-only olmali ve en az 32 karakter rastgele
+deger icermeli. Gercek degeri repoya yazma; Vercel Environment Variables
+ekranina ekle. Uretmek icin:
+
+```bash
+openssl rand -hex 32
+```
+
+veya:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Yayin oncesi:
+
+- Firebase Authentication icinde Email/Password aktif olmali.
+- `firestore.rules` Firebase Console'da publish edilmeli.
+- Resend domain kayitlari verified olmali.
+- `RESEND_API_KEY`, `FIREBASE_SERVICE_ACCOUNT_KEY` ve `RATE_LIMIT_HASH_SALT` `NEXT_PUBLIC_` olmamali.
+- Super admin disindaki adminler `/admin/ayarlar` ve `/admin/personel` ekranlarini gormez.
+- Admin/super admin musteri talep ekranlarina giremez; musteri admin paneline giremez.
+- `npm run lint` ve `npm run build` gecmeden deploy alinmamali.

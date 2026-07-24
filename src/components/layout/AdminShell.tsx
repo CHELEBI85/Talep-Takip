@@ -2,6 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import {
+  BarChart3,
+  ClipboardList,
+  Settings,
+  Trash2,
+  UserRoundCog,
+  UsersRound,
+  type LucideIcon,
+} from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Avatar } from "@/components/ui/Avatar";
@@ -12,36 +21,48 @@ type NavItem = {
   label: string;
   href: string;
   match: (p: string) => boolean;
+  icon: LucideIcon;
   superOnly?: boolean;
 };
 
 const NAV: NavItem[] = [
-  { label: "Genel Bakis", href: "/admin", match: (p) => p === "/admin" },
+  {
+    label: "Genel Bakis",
+    href: "/admin",
+    match: (p) => p === "/admin",
+    icon: BarChart3,
+  },
   {
     label: "Talepler",
     href: "/admin/talepler",
     match: (p) => p.startsWith("/admin/talep"),
+    icon: ClipboardList,
   },
   {
     label: "Musteriler",
     href: "/admin/musteriler",
     match: (p) => p.startsWith("/admin/musteriler"),
+    icon: UsersRound,
   },
   {
     label: "Personel",
     href: "/admin/personel",
     match: (p) => p.startsWith("/admin/personel"),
+    icon: UserRoundCog,
+    superOnly: true,
   },
   {
     label: "Ayarlar",
     href: "/admin/ayarlar",
     match: (p) => p.startsWith("/admin/ayarlar"),
+    icon: Settings,
     superOnly: true,
   },
   {
     label: "Cop Kutusu",
     href: "/admin/cop-kutusu",
     match: (p) => p.startsWith("/admin/cop-kutusu"),
+    icon: Trash2,
   },
 ];
 
@@ -106,6 +127,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col gap-1">
             {navItems.map((item) => {
               const active = item.match(pathname);
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.href}
@@ -116,11 +138,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                       : "font-semibold text-admin-muted hover:bg-white/5"
                   }`}
                 >
-                  <span
-                    className={`h-2 w-2 rounded-[2px] ${
-                      active ? "bg-[#a9c4f0]" : "bg-admin-dot"
-                    }`}
-                  />
+                  <Icon className="h-[17px] w-[17px] shrink-0" strokeWidth={2.2} />
                   {item.label}
                 </Link>
               );
@@ -175,6 +193,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-admin-divider bg-admin lg:hidden">
         {navItems.map((item) => {
           const active = item.match(pathname);
+          const Icon = item.icon;
           return (
             <Link
               key={item.href}
@@ -183,11 +202,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 active ? "text-white" : "text-admin-muted"
               }`}
             >
-              <span
-                className={`h-2 w-2 rounded-[2px] ${
-                  active ? "bg-[#a9c4f0]" : "bg-admin-dot"
-                }`}
-              />
+              <Icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
               {item.label}
             </Link>
           );

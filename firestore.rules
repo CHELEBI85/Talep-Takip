@@ -6,7 +6,6 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Admin e-postaları — .env.local'deki NEXT_PUBLIC_ADMIN_EMAILS ile eşleşmeli
     function isAdmin() {
       return isSignedIn() &&
         (
@@ -38,18 +37,11 @@ service cloud.firestore {
         );
     }
 
-    // Talebi oluşturanın kayıtlı kurum adı. Kurum adı istemciye (displayName)
-    // değil, yalnızca customers/{uid} belgesine güvenilerek doğrulanır.
     function myOrg() {
       return get(/databases/$(database)/documents/customers/$(request.auth.uid)).data.org;
     }
 
-    // ── Müşteri (kurum) profilleri ──
-    // Belge kimliği = auth uid. Herkes yalnızca kendi profilini yazar;
-    // admin tümünü okur (Müşteriler tablosu için).
     match /customers/{uid} {
-      // Profilde yalnızca bu alanlar bulunabilir — ileride eklenecek bir
-      // yetki alanının (ör. role) istemciden yazılmasını baştan engeller.
       function validProfile() {
         return request.resource.data.keys().hasOnly(
                  ['org', 'contact', 'phone', 'email', 'ownerUid', 'createdAt']
@@ -65,13 +57,7 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // ── Talepler ──
-    // Müşteri kendi taleplerini oluşturur/okur; durum-atama-geri bildirim
-    // ve soft-delete (çöp kutusu) güncellemelerini yalnızca admin yapar.
-    // Kalıcı silme (delete) HERKESE kapalıdır — veri asla kaybolmaz.
     match /requests/{id} {
-      // Müşteri yeni talebi yalnızca "temiz" durumda oluşturabilir:
-      // durumu, atamasını, geri bildirimini veya kurum adını kendi seçemez.
       function validNewRequest() {
         let d = request.resource.data;
         return d.keys().hasOnly([
@@ -88,12 +74,9 @@ service cloud.firestore {
                d.title is string && d.title.size() > 0 && d.title.size() <= 200 &&
                d.description is string && d.description.size() <= 5000 &&
                d.note is string && d.note.size() <= 2000 &&
-               // Belge içindeki geçmiş yalnızca oluşturma kaydını taşır.
                d.history.size() == 1;
       }
 
-      // Admin güncellemesinde de kimlik alanları değişmez kalır. Belge içi
-      // geçmiş dizisi de dondurulmuştur — yeni olaylar alt koleksiyona gider.
       function immutableFields() {
         return request.resource.data.code == resource.data.code &&
                request.resource.data.ownerUid == resource.data.ownerUid &&
@@ -102,22 +85,23 @@ service cloud.firestore {
                request.resource.data.history == resource.data.history;
       }
 
+      function adminUpdateFieldsOnly() {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status', 'assignee', 'feedback', 'updatedAt', 'deleted', 'deletedAt'
+        ]);
+      }
+
       allow read: if isAdmin() ||
         (isSignedIn() && resource.data.ownerUid == request.auth.uid);
-      allow create: if isSignedIn() && !isAdmin() && validNewRequest();
-      allow update: if isAdmin() && immutableFields();
+      allow create: if false;
+      allow update: if isAdmin() && immutableFields() && adminUpdateFieldsOnly();
       allow delete: if false;
 
-      // ── Talep geçmişi (oluşturma sonrası olaylar) ──
-      // Belge içi dizi yerine alt koleksiyon: geçmiş 1 MB belge sınırına
-      // dayanmadan büyüyebilir. Kayıt yalnızca eklenebilir — hiçbir zaman
-      // değiştirilemez veya silinemez: denetim izi.
       match /history/{entryId} {
         allow read: if isAdmin() ||
           (isSignedIn() &&
            get(/databases/$(database)/documents/requests/$(id)).data.ownerUid
              == request.auth.uid);
-        // Oluşturma sonrası her olayı yönetici üretir.
         allow create: if isAdmin() &&
           request.resource.data.keys().hasOnly(['event', 'by', 'date', 'at']) &&
           request.resource.data.event is string &&
@@ -126,21 +110,15 @@ service cloud.firestore {
       }
     }
 
-    // ── Personel ──
-    // Organizasyon içi ekip listesi; yalnızca yönetici görür ve düzenler.
-    // Listeden çıkarma, geçmiş atamaları (requests.assignee) etkilemez.
     match /staff/{id} {
       allow read: if isAdmin();
-      allow create, update: if isAdmin() &&
+      allow create, update: if isSuperAdmin() &&
         request.resource.data.name is string &&
         request.resource.data.name.size() > 0 &&
         request.resource.data.name.size() <= 100;
-      allow delete: if isAdmin();
+      allow delete: if isSuperAdmin();
     }
 
-    // Admin hesaplari ve roller.
-    // Belge kimligi = e-posta. Ortam degiskenindeki ilk adminler panelden
-    // yeni admin ekleyebilir; sonrasinda bu koleksiyon dinamik yetki verir.
     match /admins/{email} {
       function validAdmin() {
         return request.resource.data.keys().hasOnly(
@@ -156,9 +134,8 @@ service cloud.firestore {
       allow delete: if isSuperAdmin() && request.auth.token.email != email;
     }
 
-    // Sistem ayarlari.
     match /settings/notifications {
-      allow read: if isSignedIn();
+      allow read: if isAdmin();
       allow create, update: if isSuperAdmin() &&
         request.resource.data.keys().hasOnly(['recipients', 'rules', 'updatedAt']) &&
         request.resource.data.recipients is list &&
@@ -169,19 +146,16 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // ── Talep kodu sayacı (#PAX-…) ──
-    // Talep gönderiminde transaction ile artırılır; oturumlu herkes erişir.
-    // Sayaç yalnızca ileri gidebilir — geri alınıp kod çakışması üretilemez.
-    match /counters/requests {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn() &&
-        request.resource.data.keys().hasOnly(['next']) &&
-        request.resource.data.next is int;
-      allow update: if isSignedIn() &&
-        request.resource.data.keys().hasOnly(['next']) &&
-        request.resource.data.next is int &&
-        request.resource.data.next > resource.data.next;
-      allow delete: if false;
+    match /counters/{counterId} {
+      allow read, write: if false;
+    }
+
+    match /requestSubmissions/{id} {
+      allow read, create, update, delete: if false;
+    }
+
+    match /rateLimits/{id} {
+      allow read, create, update, delete: if false;
     }
   }
 }
