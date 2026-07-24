@@ -1,5 +1,7 @@
-import { ADMIN_EMAILS, ADMIN_UIDS } from "@/lib/firebase";
 import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
+import { SERVER_ADMIN_EMAILS, SERVER_ADMIN_UIDS } from "@/lib/server-config";
+
+export const runtime = "nodejs";
 
 type CreateStaffBody = {
   name?: unknown;
@@ -15,7 +17,7 @@ function normalizeEmail(email: string): string {
 
 async function isSuperAdmin(uid: string, email?: string) {
   const normalized = normalizeEmail(email ?? "");
-  if (ADMIN_UIDS.includes(uid) || ADMIN_EMAILS.includes(normalized)) return true;
+  if (SERVER_ADMIN_UIDS.includes(uid) || SERVER_ADMIN_EMAILS.includes(normalized)) return true;
   if (!normalized) return false;
 
   const snap = await getAdminDb().collection("admins").doc(normalized).get();

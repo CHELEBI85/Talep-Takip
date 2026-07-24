@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import type { Transaction } from "firebase-admin/firestore";
-import { ADMIN_EMAILS, ADMIN_UIDS } from "@/lib/firebase";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { SERVER_ADMIN_EMAILS, SERVER_ADMIN_UIDS } from "@/lib/server-config";
 
 export type RateLimitSpec = {
   id: string;
@@ -20,7 +20,7 @@ function normalizeEmail(email: string): string {
 
 export function requesterIsBootstrapAdmin(uid: string, email?: string): boolean {
   const normalized = normalizeEmail(email ?? "");
-  return ADMIN_UIDS.includes(uid) || (!!normalized && ADMIN_EMAILS.includes(normalized));
+  return SERVER_ADMIN_UIDS.includes(uid) || (!!normalized && SERVER_ADMIN_EMAILS.includes(normalized));
 }
 
 export async function requesterIsAdmin(uid: string, email?: string): Promise<boolean> {
