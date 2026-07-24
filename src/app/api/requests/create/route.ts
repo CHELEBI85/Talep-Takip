@@ -156,6 +156,18 @@ function rateLimitSpecs(uid: string, ipHash: string, requestCount: number, now: 
 }
 
 export async function POST(request: Request) {
+  try {
+    return await handlePost(request);
+  } catch (error) {
+    console.error("request create unexpected failure:", {
+      message: error instanceof Error ? error.message : "unknown",
+      name: error instanceof Error ? error.name : "unknown",
+    });
+    return safeError("Talep olusturma servisi su anda calisamadi.", 500);
+  }
+}
+
+async function handlePost(request: Request) {
   const authHeader = request.headers.get("authorization");
   const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : "";
   if (!token) return safeError("Oturum dogrulanamadi.", 401);
