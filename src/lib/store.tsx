@@ -25,6 +25,7 @@ import {
 import { useAuth } from "./auth";
 import { ADMIN_EMAILS, getDb } from "./firebase";
 import { SEED_STAFF } from "./mock-data";
+import { formatTurkeyDate, formatTurkeyStamp } from "./time";
 import type {
   Customer,
   AdminAccount,
@@ -42,9 +43,7 @@ import type {
 const p2 = (n: number) => String(n).padStart(2, "0");
 
 function fmtDate(ms: number): string {
-  if (!ms) return "";
-  const d = new Date(ms);
-  return `${p2(d.getDate())}.${p2(d.getMonth() + 1)}.${d.getFullYear()}`;
+  return formatTurkeyDate(ms);
 }
 
 function nowStamp(): string {
@@ -752,7 +751,12 @@ export function useRequestHistory(req?: Request): HistoryEvent[] {
 
   const live = docId && feed.docId === docId ? feed.rows : EMPTY_ROWS;
   return useMemo(
-    () => [...(req?.history ?? []), ...live],
+    () =>
+      [...(req?.history ?? []), ...live].map((item) =>
+        typeof item.at === "number"
+          ? { ...item, date: formatTurkeyStamp(item.at) }
+          : item
+      ),
     [req?.history, live]
   );
 }

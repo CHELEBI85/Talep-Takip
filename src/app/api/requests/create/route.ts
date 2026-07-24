@@ -8,6 +8,7 @@ import {
   type RateLimitResult,
   type RateLimitSpec,
 } from "@/lib/server-security";
+import { formatTurkeyStamp } from "@/lib/time";
 
 export const runtime = "nodejs";
 
@@ -73,13 +74,7 @@ async function readJsonBody(request: Request): Promise<
 }
 
 function nowStamp(date = new Date()): string {
-  return new Intl.DateTimeFormat("tr-TR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+  return formatTurkeyStamp(date.getTime());
 }
 
 function hasOnlyKeys(value: Record<string, unknown>, keys: string[]): boolean {
