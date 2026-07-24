@@ -33,10 +33,10 @@ export default function GirisPage() {
 
   // Oturum zaten açıksa doğru panele yönlendir.
   useEffect(() => {
-    if (!loading && user && !busy) {
+    if (!loading && user) {
       router.replace(isAdmin ? "/admin" : "/taleplerim");
     }
-  }, [loading, user, isAdmin, busy, router]);
+  }, [loading, user, isAdmin, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,14 +44,13 @@ export default function GirisPage() {
     setBusy(true);
     try {
       await signIn(email, password);
-      router.replace("/");
     } catch (err) {
       setError(authError((err as { code?: string })?.code ?? ""));
       setBusy(false);
     }
   }
 
-  if (loading || (user && !busy)) {
+  if (loading || user || busy) {
     return (
       <div className="flex min-h-[280px] items-center justify-center text-sm text-muted">
         Yukleniyor...

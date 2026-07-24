@@ -8,10 +8,21 @@ type ServiceAccountJson = {
   private_key?: string;
 };
 
+function cleanJsonEnv(value: string): string {
+  const trimmed = value.trim();
+  if (
+    (trimmed.startsWith("'") && trimmed.endsWith("'")) ||
+    (trimmed.startsWith('"') && trimmed.endsWith('"'))
+  ) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
+}
+
 function serviceAccount() {
   const json = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
   if (json) {
-    const parsed = JSON.parse(json) as ServiceAccountJson;
+    const parsed = JSON.parse(cleanJsonEnv(json)) as ServiceAccountJson;
     return {
       projectId: parsed.project_id,
       clientEmail: parsed.client_email,

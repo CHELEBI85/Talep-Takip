@@ -9,6 +9,8 @@ import {
   type RateLimitSpec,
 } from "@/lib/server-security";
 
+export const runtime = "nodejs";
+
 type CreateBody = {
   submissionId?: unknown;
   requests?: unknown;
@@ -171,8 +173,15 @@ export async function POST(request: Request) {
   if (authUser.disabled) {
     return safeError("Bu hesap aktif degil.", 403);
   }
-  if (await requesterIsAdmin(decoded.uid, decoded.email)) {
-    return safeError("Admin hesaplari talep olusturamaz.", 403);
+  try {
+    if (await requesterIsAdmin(decoded.uid, decoded.email)) {
+      return safeError("Admin hesaplari talep olusturamaz.", 403);
+    }
+  } catch (error) {
+    console.error("request create admin check failed:", {
+      message: error instanceof Error ? error.message : "unknown",
+    });
+    return safeError("Sunucu yetki kontrolu yapilamadi.", 500);
   }
 
   const bodyResult = await readJsonBody(request);
@@ -183,7 +192,15 @@ export async function POST(request: Request) {
     return safeError("Talep bilgileri eksik veya gecersiz.", 400);
   }
 
-  const db = getAdminDb();
+  let db;
+  try {
+    db = getAdminDb();
+  } catch (error) {
+    console.error("request create db init failed:", {
+      message: error instanceof Error ? error.message : "unknown",
+    });
+    return safeError("Firebase Admin yapilandirmasi eksik.", 500);
+  }
   const customerRef = db.collection("customers").doc(decoded.uid);
   const counterRef = db.collection("counters").doc("requests");
   const idemRef = db.collection("requestSubmissions").doc(`${decoded.uid}_${parsed.submissionId}`);

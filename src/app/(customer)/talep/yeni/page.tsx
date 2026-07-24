@@ -65,7 +65,9 @@ export default function YeniTalepPage() {
     } catch (e) {
       console.error("submitDrafts:", e);
       setSubmitError(
-        "Talepler gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin."
+        e instanceof Error
+          ? e.message
+          : "Talepler gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin."
       );
     } finally {
       setSubmitting(false);

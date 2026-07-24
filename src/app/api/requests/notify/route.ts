@@ -9,6 +9,8 @@ import {
   type RateLimitResult,
 } from "@/lib/server-security";
 
+export const runtime = "nodejs";
+
 type NotifyBody = {
   requestIds?: unknown;
 };
@@ -174,10 +176,20 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, error: "Oturum dogrulanamadi." }, { status: 401 });
   }
 
-  if (await requesterIsAdmin(decoded.uid, decoded.email)) {
+  try {
+    if (await requesterIsAdmin(decoded.uid, decoded.email)) {
+      return Response.json(
+        { ok: false, error: "Admin hesaplari talep bildirimi gonderemez." },
+        { status: 403 }
+      );
+    }
+  } catch (error) {
+    console.error("request notify admin check failed:", {
+      message: error instanceof Error ? error.message : "unknown",
+    });
     return Response.json(
-      { ok: false, error: "Admin hesaplari talep bildirimi gonderemez." },
-      { status: 403 }
+      { ok: false, error: "Sunucu yetki kontrolu yapilamadi." },
+      { status: 500 }
     );
   }
 
@@ -187,7 +199,18 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, error: "Bildirim verisi eksik." }, { status: 400 });
   }
 
-  const db = getAdminDb();
+  let db;
+  try {
+    db = getAdminDb();
+  } catch (error) {
+    console.error("request notify db init failed:", {
+      message: error instanceof Error ? error.message : "unknown",
+    });
+    return Response.json(
+      { ok: false, error: "Firebase Admin yapilandirmasi eksik." },
+      { status: 500 }
+    );
+  }
   const now = Date.now();
   let rateLimit: RateLimitResult;
   try {
