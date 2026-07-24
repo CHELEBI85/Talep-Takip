@@ -8,7 +8,7 @@ import {
   updateProfile,
   type User,
 } from "firebase/auth";
-import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import {
   createContext,
   useContext,
@@ -95,7 +95,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const u = cred.user;
         const admin =
           (!!u.email && ADMIN_EMAILS.includes(u.email.toLowerCase())) ||
-          ADMIN_UIDS.includes(u.uid);
+          ADMIN_UIDS.includes(u.uid) ||
+          (!!u.email &&
+            (await getDoc(doc(getDb(), "admins", u.email.toLowerCase()))).exists());
         if (!admin) {
           try {
             await setDoc(

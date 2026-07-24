@@ -23,7 +23,7 @@ import {
   type ReactNode,
 } from "react";
 import { useAuth } from "./auth";
-import { getDb } from "./firebase";
+import { ADMIN_EMAILS, getDb } from "./firebase";
 import { SEED_STAFF } from "./mock-data";
 import type {
   Customer,
@@ -393,15 +393,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const customers: Customer[] = useMemo(
-    () =>
-      customerDocs.map((c) => ({
+    () => {
+      const adminEmails = new Set([
+        ...ADMIN_EMAILS,
+        ...admins.map((admin) => normalizeEmail(admin.email)),
+        ...staff.map((person) => normalizeEmail(person.email ?? "")),
+      ]);
+      return customerDocs
+        .filter((c) => !adminEmails.has(normalizeEmail(c.email)))
+        .map((c) => ({
         name: c.org,
         initials: c.initials,
         contact: c.contact,
         email: c.email,
         requests: activeRequests.filter((r) => r.ownerUid === c.ownerUid).length,
-      })),
-    [customerDocs, activeRequests]
+      }));
+    },
+    [customerDocs, activeRequests, admins, staff]
   );
 
   // ── Draft (yerel) ──
