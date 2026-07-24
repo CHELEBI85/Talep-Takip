@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { Pagination } from "@/components/ui/Pagination";
 import { StatusPill } from "@/components/ui/StatusPill";
 import { useStore } from "@/lib/store";
 import { STATUSES } from "@/lib/types";
 
 const COLS = "grid-cols-[1.6fr_1.1fr_1fr_1fr_0.9fr]";
+const PAGE_SIZE = 20;
 
 export default function AdminTaleplerPage() {
   const { requests, customers, staff, hasMore, loadMore } = useStore();
@@ -16,6 +18,7 @@ export default function AdminTaleplerPage() {
   const [status, setStatus] = useState("Tümü");
   const [assignee, setAssignee] = useState("Tümü");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   const list = useMemo(() => {
     const q = search.trim().toLocaleLowerCase("tr");
@@ -34,6 +37,13 @@ export default function AdminTaleplerPage() {
     });
   }, [requests, org, status, assignee, search]);
 
+  const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageRows = useMemo(
+    () => list.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [list, safePage]
+  );
+
   const href = (id: string) => `/admin/talep/${id.replace("#", "")}`;
 
   return (
@@ -43,7 +53,10 @@ export default function AdminTaleplerPage() {
         right={
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             placeholder="Ara: talep, kurum…"
             className="w-full min-w-0 rounded-[9px] border border-border-input bg-[#f2f4f9] px-3.5 py-2.5 text-[13px] font-medium text-ink outline-none placeholder:text-faint-2 focus:border-primary focus:bg-white sm:w-64"
           />
@@ -56,19 +69,28 @@ export default function AdminTaleplerPage() {
           <FilterSelect
             label="Kurum"
             value={org}
-            onChange={setOrg}
+            onChange={(value) => {
+              setOrg(value);
+              setPage(1);
+            }}
             options={customers.map((c) => c.name)}
           />
           <FilterSelect
             label="Durum"
             value={status}
-            onChange={setStatus}
+            onChange={(value) => {
+              setStatus(value);
+              setPage(1);
+            }}
             options={[...STATUSES]}
           />
           <FilterSelect
             label="Atanan"
             value={assignee}
-            onChange={setAssignee}
+            onChange={(value) => {
+              setAssignee(value);
+              setPage(1);
+            }}
             options={[...staff.map((s) => s.name), "—"]}
           />
           <div className="ml-auto self-center text-[13px] font-semibold text-muted-2">
@@ -87,7 +109,7 @@ export default function AdminTaleplerPage() {
             <span>Atanan</span>
             <span>Güncelleme</span>
           </div>
-          {list.map((r) => (
+          {pageRows.map((r) => (
             <Link
               key={r.id}
               href={href(r.id)}
@@ -116,7 +138,7 @@ export default function AdminTaleplerPage() {
 
         {/* ── Mobil kart listesi ── */}
         <div className="flex flex-col gap-3 sm:hidden">
-          {list.map((r) => (
+          {pageRows.map((r) => (
             <Link
               key={r.id}
               href={href(r.id)}
@@ -142,6 +164,13 @@ export default function AdminTaleplerPage() {
         </div>
 
         {/* Liste en yeni taleplerle sınırlıdır; daha eskiler istek üzerine gelir. */}
+        <Pagination
+          page={safePage}
+          pageSize={PAGE_SIZE}
+          totalItems={list.length}
+          onPageChange={setPage}
+        />
+
         {hasMore && (
           <div className="mt-4 text-center">
             <button

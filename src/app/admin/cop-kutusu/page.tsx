@@ -1,14 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { Pagination } from "@/components/ui/Pagination";
 import { StatusPill } from "@/components/ui/StatusPill";
 import { useStore } from "@/lib/store";
+
+const PAGE_SIZE = 10;
 
 export default function AdminCopKutusuPage() {
   const { trash, restore } = useStore();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+
+  const totalPages = Math.max(1, Math.ceil(trash.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const rows = useMemo(
+    () => trash.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [trash, safePage]
+  );
 
   async function handleRestore(id: string) {
     setBusyId(id);
@@ -42,7 +53,7 @@ export default function AdminCopKutusuPage() {
           </p>
         ) : (
           <div className="flex flex-col gap-3">
-            {trash.map((r) => (
+            {rows.map((r) => (
               <div
                 key={r.id}
                 className="rounded-[13px] border border-border-card bg-white px-4 py-4 sm:px-[18px]"
@@ -77,6 +88,13 @@ export default function AdminCopKutusuPage() {
             ))}
           </div>
         )}
+
+        <Pagination
+          page={safePage}
+          pageSize={PAGE_SIZE}
+          totalItems={trash.length}
+          onPageChange={setPage}
+        />
       </div>
     </>
   );

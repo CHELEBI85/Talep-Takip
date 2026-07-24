@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Field";
+import { Pagination } from "@/components/ui/Pagination";
 import { useAuth } from "@/lib/auth";
 import { useStore } from "@/lib/store";
 
@@ -21,6 +22,8 @@ function initialsOf(name: string): string {
   );
 }
 
+const PAGE_SIZE = 12;
+
 export default function AdminPersonelPage() {
   const router = useRouter();
   const { adminRole, loading } = useAuth();
@@ -31,15 +34,23 @@ export default function AdminPersonelPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
 
-  const rows = staff.map((person) => {
+  const allRows = useMemo(() => staff.map((person) => {
     const assigned = requests.filter((request) => request.assignee === person.name);
     const active = assigned.filter(
       (request) =>
         request.status !== "Tamamlandı" && request.status !== "İptal edildi"
     ).length;
     return { ...person, total: assigned.length, active };
-  });
+  }), [staff, requests]);
+
+  const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const rows = useMemo(
+    () => allRows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [allRows, safePage]
+  );
 
   useEffect(() => {
     if (!loading && adminRole !== "super_admin") router.replace("/admin");
@@ -157,7 +168,7 @@ export default function AdminPersonelPage() {
           )}
         </section>
 
-        {rows.length === 0 ? (
+        {allRows.length === 0 ? (
           <div className="rounded-card border border-dashed border-border-card bg-white px-4 py-10 text-center text-sm text-faint-2">
             Henuz personel hesabi acilmamis.
           </div>
@@ -192,6 +203,12 @@ export default function AdminPersonelPage() {
             ))}
           </div>
         )}
+        <Pagination
+          page={safePage}
+          pageSize={PAGE_SIZE}
+          totalItems={allRows.length}
+          onPageChange={setPage}
+        />
       </div>
     </>
   );

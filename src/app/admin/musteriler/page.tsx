@@ -1,13 +1,24 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Avatar } from "@/components/ui/Avatar";
+import { Pagination } from "@/components/ui/Pagination";
 import { useStore } from "@/lib/store";
 
 const COLS = "grid-cols-[1.5fr_1.4fr_0.7fr]";
+const PAGE_SIZE = 20;
 
 export default function AdminMusterilerPage() {
   const { customers } = useStore();
+  const [page, setPage] = useState(1);
+
+  const totalPages = Math.max(1, Math.ceil(customers.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const rows = useMemo(
+    () => customers.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [customers, safePage]
+  );
 
   return (
     <>
@@ -23,9 +34,9 @@ export default function AdminMusterilerPage() {
             <span>Yetkili</span>
             <span>Talep</span>
           </div>
-          {customers.map((c, i) => (
+          {rows.map((c, i) => (
             <div
-              key={`${c.email}-${i}`}
+              key={`${c.email}-${(safePage - 1) * PAGE_SIZE + i}`}
               className={`grid ${COLS} items-center border-b border-[#f1f3f8] px-[18px] py-[15px] last:border-0`}
             >
               <div className="flex items-center gap-2.5">
@@ -47,9 +58,9 @@ export default function AdminMusterilerPage() {
 
         {/* ── Mobil kart listesi ── */}
         <div className="flex flex-col gap-3 sm:hidden">
-          {customers.map((c, i) => (
+          {rows.map((c, i) => (
             <div
-              key={`${c.email}-${i}`}
+              key={`${c.email}-${(safePage - 1) * PAGE_SIZE + i}`}
               className="rounded-[12px] border border-border-card bg-white p-3.5"
             >
               <div className="flex items-center gap-2.5">
@@ -68,6 +79,13 @@ export default function AdminMusterilerPage() {
             </div>
           ))}
         </div>
+
+        <Pagination
+          page={safePage}
+          pageSize={PAGE_SIZE}
+          totalItems={customers.length}
+          onPageChange={setPage}
+        />
       </div>
     </>
   );

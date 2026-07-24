@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Chip } from "@/components/ui/Chip";
+import { Pagination } from "@/components/ui/Pagination";
 import { StatusPill } from "@/components/ui/StatusPill";
 import { useStore } from "@/lib/store";
 import { STATUSES, type Status } from "@/lib/types";
@@ -11,14 +12,24 @@ import { STATUSES, type Status } from "@/lib/types";
 type Filter = "Tümü" | Status;
 const FILTERS: Filter[] = ["Tümü", ...STATUSES];
 
+const PAGE_SIZE = 10;
+
 export default function TaleplerimPage() {
   const { myRequests } = useStore();
+  const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<Filter>("Tümü");
 
   const list =
     filter === "Tümü"
       ? myRequests
       : myRequests.filter((r) => r.status === filter);
+
+  const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageRows = useMemo(
+    () => list.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [list, safePage]
+  );
 
   return (
     <>
@@ -38,7 +49,14 @@ export default function TaleplerimPage() {
         {/* Filtre çipleri */}
         <div className="no-scrollbar -mx-5 mb-[18px] flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0">
           {FILTERS.map((f) => (
-            <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>
+            <Chip
+              key={f}
+              active={filter === f}
+              onClick={() => {
+                setFilter(f);
+                setPage(1);
+              }}
+            >
               {f}
             </Chip>
           ))}
@@ -51,7 +69,7 @@ export default function TaleplerimPage() {
           </p>
         ) : (
           <div className="flex flex-col gap-3">
-            {list.map((r) => (
+            {pageRows.map((r) => (
               <Link
                 key={r.id}
                 href={`/talep/${r.id.replace("#", "")}`}
@@ -84,6 +102,13 @@ export default function TaleplerimPage() {
             ))}
           </div>
         )}
+
+        <Pagination
+          page={safePage}
+          pageSize={PAGE_SIZE}
+          totalItems={list.length}
+          onPageChange={setPage}
+        />
       </div>
     </>
   );
