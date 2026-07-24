@@ -85,7 +85,7 @@ export default function YeniTalepPage() {
         }
       />
 
-      <div className="grid grid-cols-1 items-start gap-6 p-5 sm:p-7 lg:grid-cols-[1fr_360px]">
+      <div className="grid grid-cols-1 items-start gap-5 p-4 sm:gap-6 sm:p-7 lg:grid-cols-[1fr_360px]">
         {/* ── Form ── */}
         <div className="rounded-card border border-border-card bg-white p-5 sm:p-6">
           <h2 className="mb-4 text-sm font-extrabold">
@@ -125,11 +125,11 @@ export default function YeniTalepPage() {
             className="mb-4"
           />
 
-          <div className="flex items-center gap-3">
-            <Button variant="soft" onClick={handleAdd} disabled={!canAdd}>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Button variant="soft" onClick={handleAdd} disabled={!canAdd} className="w-full sm:w-auto">
               {editingId ? "Değişikliği kaydet" : "+ Listeye ekle"}
             </Button>
-            <Button variant="ghost" onClick={resetForm} type="button">
+            <Button variant="ghost" onClick={resetForm} type="button" className="w-full sm:w-auto">
               {editingId ? "Vazgeç" : "Temizle"}
             </Button>
           </div>
@@ -160,7 +160,7 @@ export default function YeniTalepPage() {
                     <div className="min-w-0 break-words text-sm font-bold leading-snug">
                       {d.title}
                     </div>
-                    <div className="flex shrink-0 gap-2.5 text-xs font-bold">
+                    <div className="flex shrink-0 flex-col items-end gap-1.5 text-xs font-bold min-[380px]:flex-row min-[380px]:gap-2.5">
                       <button
                         onClick={() => handleEdit(d)}
                         className="text-primary-light hover:underline"

@@ -165,8 +165,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col bg-panel">
-        <div className="flex items-center justify-between bg-admin px-5 py-3 lg:hidden">
-          <div className="flex items-center gap-2.5">
+        <div className="flex items-center justify-between gap-3 bg-admin px-4 py-3 lg:hidden">
+          <div className="flex min-w-0 items-center gap-2.5">
             <Image
               src="/pax-mark.png"
               alt="Pax"
@@ -175,7 +175,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className="h-6 w-6 object-contain"
               priority
             />
-            <span className="text-base font-extrabold text-white">
+            <span className="min-w-0 truncate text-base font-extrabold text-white">
               Pax Admin - {activeLabel}
             </span>
           </div>
@@ -187,10 +187,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        <div className="flex-1 pb-24 lg:pb-0">{children}</div>
+        <div className="flex-1 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-0">
+          {children}
+        </div>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-admin-divider bg-admin lg:hidden">
+      <nav className="no-scrollbar fixed inset-x-0 bottom-0 z-30 flex overflow-x-auto border-t border-admin-divider bg-admin pb-[env(safe-area-inset-bottom)] lg:hidden">
         {navItems.map((item) => {
           const active = item.match(pathname);
           const Icon = item.icon;
@@ -198,7 +200,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-bold ${
+              className={`flex min-w-[74px] flex-1 flex-col items-center justify-center gap-1 px-2 py-2.5 text-center text-[11px] font-bold ${
                 active ? "text-white" : "text-admin-muted"
               }`}
             >

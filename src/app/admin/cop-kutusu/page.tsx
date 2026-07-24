@@ -41,7 +41,7 @@ export default function AdminCopKutusuPage() {
         }
       />
 
-      <div className="p-5 sm:p-7">
+      <div className="p-4 sm:p-7">
         <p className="mb-[18px] rounded-field bg-primary-soft px-3.5 py-3 text-[13px] leading-relaxed text-primary">
           Silinen talepler burada saklanır — hiçbir veri kalıcı olarak
           silinmez. İstediğiniz zaman geri yükleyebilirsiniz.

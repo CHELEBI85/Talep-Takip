@@ -45,9 +45,9 @@ export default function TaleplerimPage() {
         }
       />
 
-      <div className="p-5 sm:p-7">
+      <div className="p-4 sm:p-7">
         {/* Filtre çipleri */}
-        <div className="no-scrollbar -mx-5 mb-[18px] flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:flex-wrap sm:px-0">
+        <div className="no-scrollbar -mx-4 mb-[18px] flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
           {FILTERS.map((f) => (
             <Chip
               key={f}

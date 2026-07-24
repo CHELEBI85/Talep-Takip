@@ -6,7 +6,7 @@ import type {
 } from "react";
 
 const fieldBase =
-  "w-full rounded-field bg-input border border-border-input text-sm text-ink placeholder:text-faint outline-none transition-colors focus:border-primary focus:bg-white";
+  "w-full rounded-field bg-input border border-border-input text-base text-ink placeholder:text-faint outline-none transition-colors focus:border-primary focus:bg-white sm:text-sm";
 
 export function Label({
   children,

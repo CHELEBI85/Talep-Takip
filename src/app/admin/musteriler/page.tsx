@@ -24,7 +24,7 @@ export default function AdminMusterilerPage() {
     <>
       <PageHeader title="Müşteriler" />
 
-      <div className="p-5 sm:p-7">
+      <div className="p-4 sm:p-7">
         {/* ── Masaüstü tablo ── */}
         <div className="hidden overflow-hidden rounded-card border border-border-card bg-white sm:block">
           <div

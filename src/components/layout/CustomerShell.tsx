@@ -132,7 +132,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col bg-panel">
-        <div className="flex items-center justify-between border-b border-border-divider bg-white px-5 py-3 lg:hidden">
+        <div className="flex items-center justify-between gap-3 border-b border-border-divider bg-white px-4 py-3 lg:hidden">
           <Image
             src="/pax-logo.png"
             alt="Pax Medya"
@@ -150,10 +150,12 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        <div className="flex-1 pb-24 lg:pb-0">{children}</div>
+        <div className="flex-1 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-0">
+          {children}
+        </div>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-border-divider bg-white lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-border-divider bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
         {NAV.map((item) => {
           const active = item.match(pathname);
           const Icon = item.icon;
@@ -161,7 +163,7 @@ export function CustomerShell({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-xs font-bold ${
+              className={`flex min-w-[86px] flex-1 flex-col items-center justify-center gap-1 px-2 py-2.5 text-center text-xs font-bold ${
                 active ? "text-primary" : "text-muted-2"
               }`}
             >

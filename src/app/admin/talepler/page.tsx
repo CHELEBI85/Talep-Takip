@@ -63,7 +63,7 @@ export default function AdminTaleplerPage() {
         }
       />
 
-      <div className="p-5 sm:p-7">
+      <div className="p-4 sm:p-7">
         {/* Filtre çubuğu */}
         <div className="mb-[18px] flex flex-wrap items-center gap-3">
           <FilterSelect

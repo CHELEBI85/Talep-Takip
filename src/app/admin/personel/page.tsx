@@ -99,7 +99,7 @@ export default function AdminPersonelPage() {
     <>
       <PageHeader title="Personel" />
 
-      <div className="p-5 sm:p-7">
+      <div className="p-4 sm:p-7">
         <section className="mb-5 rounded-card border border-border-card bg-white p-4 sm:p-5">
           <div className="mb-4">
             <h2 className="text-sm font-extrabold">Personel hesabi ac</h2>
@@ -147,6 +147,7 @@ export default function AdminPersonelPage() {
             <div className="flex items-end">
               <Button
                 onClick={handleCreateAccount}
+                className="w-full lg:w-auto"
                 disabled={
                   busy || !name.trim() || !email.trim() || password.length < 6
                 }

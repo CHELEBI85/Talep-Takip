@@ -224,7 +224,11 @@ export default function AdminAyarlarPage() {
               </Select>
             </div>
             <div className="flex items-end">
-              <Button onClick={handleAddAdmin} disabled={busy || !normalizeEmail(email)}>
+              <Button
+                onClick={handleAddAdmin}
+                disabled={busy || !normalizeEmail(email)}
+                className="w-full sm:w-auto"
+              >
                 Ekle
               </Button>
             </div>
@@ -313,6 +317,7 @@ export default function AdminAyarlarPage() {
                   variant="soft"
                   onClick={handleChangePassword}
                   disabled={busy || !normalizeEmail(passwordEmail) || newPassword.length < 6}
+                  className="w-full sm:w-auto"
                 >
                   Sifreyi degistir
                 </Button>
